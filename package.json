@@ -1,0 +1,45 @@
+{
+  "name": "image-resize-compress",
+  "version": "1.0.0",
+  "description": "Image resizer, compressor and converter",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode production",
+    "prepublish": "npm run build"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
+  "keywords": [
+    "image",
+    "resize",
+    "compress",
+    "reduce",
+    "png",
+    "jpeg",
+    "webp"
+  ],
+  "author": "Alef Duarte",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.10.3",
+    "babel-loader": "^8.1.0",
+    "eslint": "^7.3.0",
+    "eslint-config-airbnb": "18.2.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-prettier": "^3.1.4",
+    "prettier": "^2.0.5",
+    "@babel/preset-env": "^7.10.3",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12"
+  },
+  "dependencies": {}
+}
