@@ -23,10 +23,12 @@
     "reduce",
     "png",
     "jpeg",
-    "webp"
+    "webp",
+    "react"
   ],
   "author": "Alef Duarte",
   "license": "MIT",
+  "repository": "alefduarte/image-resize-compress",
   "devDependencies": {
     "@babel/core": "^7.10.3",
     "babel-loader": "^8.1.0",
