@@ -6,6 +6,8 @@
 
 You can use a File, Blob or even a url.
 
+Check out the [DEMO](https://alefduarte.github.io/image-resize-compress-demo/) page.
+
 ## Installation
 
 ### npm
