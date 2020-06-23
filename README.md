@@ -1,4 +1,4 @@
-# image-resize-compress
+# [image-resize-compress](https://www.npmjs.com/package/image-resize-compress)
 
 [![License](https://img.shields.io/npm/l/image-resize-compress.svg)](https://www.npmjs.com/package/image-resize-compress) [![minified size](https://img.shields.io/bundlephobia/min/image-resize-compress.svg)](https://www.npmjs.com/package/image-resize-compress) [![Version](https://img.shields.io/npm/v/image-resize-compress.svg)](https://www.npmjs.com/package/image-resize-compress)
 
