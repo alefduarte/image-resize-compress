@@ -10,14 +10,17 @@ import fromBlob from './fromBlob';
  * @returns {Blob} Returns compressed, resized and converted image.
  */
 
-const fromURL = async (url, quality = 100, width = 0, height = 0, format = null) => {
-  return await fetch(url)
+const fromURL = (url, quality = 100, width = 0, height = 0, format = null) => {
+  return fetch(url)
     .then((res) => res.blob())
     .then((blob) => {
       return fromBlob(blob, quality, width, height, format);
     })
     .catch((error) => {
-      throw new Error('Failed to fetch. Image might be protected. See Cross Origin Resource Sharing. Error: ' + error);
+      throw new Error(
+        'Failed to fetch. Image might be protected. See Cross Origin Resource Sharing. Error: ' +
+          error
+      );
     });
 };
 
