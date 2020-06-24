@@ -1,6 +1,6 @@
 {
   "name": "image-resize-compress",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Image resizer, compressor and converter",
   "main": "src/index.js",
   "engines": {
