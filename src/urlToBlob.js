@@ -6,8 +6,8 @@
  * @returns {Blob} Returns image as Blob.
  */
 
-const urlToBlob = async (url, options = null) => {
-  return await fetch(url, options)
+const urlToBlob = (url, options = null) => {
+  return fetch(url, options)
     .then((res) => res.blob())
     .catch((error) => {
       throw new Error('Failed to fetch. Image might be protected. Error: ' + error);
