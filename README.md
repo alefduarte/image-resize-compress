@@ -122,6 +122,30 @@ const handleBlob = (sourceUrl) => {
 };
 ```
 
+##VanillaJS
+
+```html
+<!-- make sure you have previously imported the library -->
+<script src="https://cdn.jsdelivr.net/npm/image-resize-compress@1.0.7/dist/index.min.js"></script>
+
+<!-- then you may call it like so -->
+<script>
+  function resizeImage() {
+    var file = document.forms['myForm']['file'].files[0];
+    var res = fromBlob(file).then(function (res) {
+      console.log(res);
+    });
+  }
+  // or
+  function resizeImage() {
+    var file = document.forms['myForm']['file'].files[0];
+    var res = fromBlob(file, 75, 0, 0, 'webp').then(function (res) {
+      console.log(res);
+    });
+  }
+</script>
+```
+
 ## Methods
 
 ### `blobToURL(file) → {Promise(string)}`
