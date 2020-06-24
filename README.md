@@ -31,6 +31,12 @@ import * as imageResizeCompress from 'image-resize-compress'; // ES6
 var imageResizeCompress = require('image-resize-compress'); // ES5 with npm
 ```
 
+#### VanillaJS
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/image-resize-compress@1/dist/index.js"></script>
+```
+
 ## Usage
 
 ### From a Blob or File
