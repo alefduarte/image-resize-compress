@@ -1,4 +1,4 @@
-import fromBlob from './fromBlob';
+import fromBlob from './fromBlob.js';
 /**
  * Compress, resize or convert an image from url
  *
