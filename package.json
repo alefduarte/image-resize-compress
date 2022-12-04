@@ -3,6 +3,7 @@
   "version": "1.0.8",
   "description": "Image resizer, compressor and converter",
   "main": "src/index.js",
+  "type": "module",
   "engines": {
     "node": ">=4.0.0"
   },
