@@ -1,21 +1,31 @@
 {
   "name": "image-resize-compress",
-  "version": "1.1.0",
-  "description": "Image resizer, compressor and converter",
-  "main": "src/index.js",
+  "version": "2.0.0",
+  "description": "Image resizer, compressor, and converter built with modern TypeScript support",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
-  "engines": {
-    "node": ">=4.0.0"
+  "sideEffects": false,
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./types": "./dist/index.d.ts"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --mode production",
-    "prepare": "npm run build"
-  },
-  "babel": {
-    "presets": [
-      "@babel/preset-env"
-    ]
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "lint": "eslint ./src/*",
+    "format": "prettier --write 'src/**/*.{ts,tsx,json,md}'",
+    "clean": "rm -rf dist",
+    "test": "jest",
+    "test:debug": "jest --runInBand"
   },
   "keywords": [
     "image",
@@ -25,24 +35,32 @@
     "png",
     "jpeg",
     "webp",
-    "react"
+    "react",
+    "typescript"
   ],
   "author": "Alef Duarte",
   "license": "MIT",
-  "repository": "alefduarte/image-resize-compress",
-  "devDependencies": {
-    "@babel/core": "^7.10.3",
-    "@babel/preset-env": "^7.10.3",
-    "babel-loader": "^8.1.0",
-    "eslint": "^7.3.0",
-    "eslint-config-airbnb": "18.2.0",
-    "eslint-config-airbnb-base": "^14.2.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-import": "^2.21.2",
-    "eslint-plugin-prettier": "^3.1.4",
-    "prettier": "^2.0.5",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.12"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alefduarte/image-resize-compress.git"
   },
-  "dependencies": {}
+  "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.10.1",
+    "eslint": "^9.16.0",
+    "globals": "^15.12.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "prettier": "3.4.1",
+    "ts-jest": "^29.2.5",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.16.0"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
 }
