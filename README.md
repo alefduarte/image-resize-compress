@@ -2,242 +2,196 @@
 
 [![License](https://img.shields.io/npm/l/image-resize-compress)](https://www.npmjs.com/package/image-resize-compress) [![minified size](https://img.shields.io/bundlephobia/min/image-resize-compress.svg)](https://www.npmjs.com/package/image-resize-compress) [![Version](https://img.shields.io/npm/v/image-resize-compress.svg)](https://www.npmjs.com/package/image-resize-compress)
 
-`image-resize-compress` is a library that allows you to compress, resize or convert an image without any extra dependency.
+`image-resize-compress` is a lightweight library that enables you to compress, resize, or convert images effortlessly. It supports working with `File`, `Blob`, and even URLs without any additional dependencies.
 
-You can use a File, Blob or even a url.
+✨ [Demo](https://alefduarte.github.io/image-resize-compress-demo/)
 
-Check out the [DEMO](https://alefduarte.github.io/image-resize-compress-demo/) page.
+## 🚀 Installation
 
-## Installation
-
-### npm
+### Using npm
 
 ```sh
 npm install --save image-resize-compress
 ```
 
-### yarn
+### Using yarn
 
 ```sh
 yarn add image-resize-compress
 ```
 
-## Importing
+## 📦 Importing the Library
+
+### ES6 Import
 
 ```js
-import { blobToURL, urlToBlob, fromBlob, fromURL } from 'image-resize-compress'; // ES6
-// or
-import * as imageResizeCompress from 'image-resize-compress'; // ES6
-var imageResizeCompress = require('image-resize-compress'); // ES5 with npm
+import { blobToURL, urlToBlob, fromBlob, fromURL } from 'image-resize-compress';
 ```
 
-#### VanillaJS
+### CommonJS Require
+
+```js
+var imageResizeCompress = require('image-resize-compress');
+```
+
+### VanillaJS via CDN
+
+Include the library in your HTML file:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/image-resize-compress@1/dist/index.js"></script>
 ```
 
-## Usage
+## 🔧 Usage
 
-### From a Blob or File
+### Example 1: From a Blob or File
 
 ```js
-import { blobToURL, fromBlob } from 'image-resize-compress';
-const handleBlob = (blobFile) => {
-  // quality value for webp and jpeg formats.
-  const quality = 80;
-  // output width. 0 will keep its original width and 'auto' will calculate its scale from height.
-  const width = 0;
-  // output height. 0 will keep its original height and 'auto' will calculate its scale from width.
-  const height = 0;
-  // file format: png, jpeg, bmp, gif, webp. If null, original format will be used.
-  const format = 'webp';
+import { fromBlob, blobToURL } from 'image-resize-compress';
 
-  // note only the blobFile argument is required
-  fromBlob(blobFile, quality, width, height, format).then((blob) => {
-    // will output the converted blob file
-    console.log(blob);
-    // will generate a url to the converted file
-    blobToURL(blob).then((url) => console.log(url));
-  });
+const handleBlob = async (blobFile) => {
+  const quality = 80; // For webp and jpeg formats
+  const width = 'auto'; // Original width
+  const height = 'auto'; // Original height
+  const format = 'webp'; // Output format
+
+  const resizedBlob = await fromBlob(blobFile, quality, width, height, format);
+  const url = await blobToURL(resizedBlob);
+
+  console.log('Resized Blob:', resizedBlob);
+  console.log('Blob URL:', url);
 };
 ```
 
-you may display the file by doing so
+You can use the generated URL to display the image:
 
 ```html
-<img src={url} alt="compressed file"></img>
+<img src="{url}" alt="Resized image" />
 ```
 
-### From a URL
+### Example 2: From a URL
 
 ```js
-import { blobToURL, fromURL } from 'image-resize-compress';
-const handleBlob = (sourceUrl) => {
-  // quality value for webp and jpeg formats.
-  const quality = 80;
-  // output width. 0 will keep its original width and 'auto' will calculate its scale from height.
-  const width = 0;
-  // output height. 0 will keep its original height and 'auto' will calculate its scale from width.
-  const height = 0;
-  // file format: png, jpeg, bmp, gif, webp. If null, original format will be used.
-  const format = 'webp';
+import { fromURL, blobToURL } from 'image-resize-compress';
 
-  // note only the sourceUrl argument is required
-  fromURL(sourceUrl, quality, width, height, format).then((blob) => {
-    // will output the converted blob file
-    console.log(blob);
-    // will generate a url to the converted file
-    blobToURL(blob).then((url) => console.log(url));
-  });
+const handleURL = async (imageUrl) => {
+  const quality = 80;
+  const width = 'auto';
+  const height = 'auto';
+  const format = 'jpeg';
+
+  const resizedBlob = await fromURL(imageUrl, quality, width, height, format);
+  const url = await blobToURL(resizedBlob);
+
+  console.log('Resized Blob:', resizedBlob);
+  console.log('Blob URL:', url);
 };
 ```
 
-You may also use `urlToBlob`. Note that server must accept cors requests.
+**Note**: Ensure the server hosting the image allows [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) requests.
 
-See [Cross-Origin Resource Sharing (CORS)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
-
-```js
-import { blobToURL, urlToBlob, fromBlob } from 'image-resize-compress';
-const handleBlob = (sourceUrl) => {
-  // quality value for webp and jpeg formats.
-  const quality = 80;
-  // output width. 0 will keep its original width and 'auto' will calculate its scale from height.
-  const width = 0;
-  // output height. 0 will keep its original height and 'auto' will calculate its scale from width.
-  const height = 0;
-  // file format: png, jpeg, bmp, gif, webp. If null, original format will be used.
-  const format = 'webp';
-
-  // converts given url to blob file using fetch
-  const blobFile = urlToBlob(sourceUrl);
-
-  // note only the blobFile argument is required
-  fromBlob(blobFile, quality, width, height, format).then((blob) => {
-    // will output the converted blob file
-    console.log(blob);
-    // will generate a url to the converted file
-    blobToURL(blob).then((url) => console.log(url));
-  });
-};
-```
-
-##VanillaJS
+## 🌐 VanillaJS Example
 
 ```html
-<!-- make sure you have previously imported the library -->
-<script src="https://cdn.jsdelivr.net/npm/image-resize-compress@1.0.7/dist/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/image-resize-compress/dist/index.min.js"></script>
 
-<!-- then you may call it like so -->
 <script>
-  function resizeImage() {
-    var file = document.forms['myForm']['file'].files[0];
-    var res = fromBlob(file).then(function (res) {
-      console.log(res);
-    });
-  }
-  // or
-  function resizeImage() {
-    var file = document.forms['myForm']['file'].files[0];
-    var res = fromBlob(file, 75, 0, 0, 'webp').then(function (res) {
-      console.log(res);
-    });
+  async function resizeImage() {
+    const file = document.querySelector('#fileInput').files[0];
+    const resizedBlob = await imageResizeCompress.fromBlob(
+      file,
+      75,
+      0,
+      0,
+      'webp',
+    );
+    console.log(resizedBlob);
   }
 </script>
+
+<input type="file" id="fileInput" onchange="resizeImage()" />
 ```
 
-## Methods
+## 🛠️ Methods
 
-### `blobToURL(file) → {Promise(string)}`
+### `blobToURL(blob: Blob | File) → Promise<string>`
 
-#### Description
+Converts a `Blob` or `File` into a `Data URL`.
 
-Converts a given File or Blob into a DataURL string.
+#### **Parameters**:
 
-#### Parameters
-
-| Name | Type         | Attributes | Description           |
-| ---- | ------------ | ---------- | --------------------- |
-| file | (File\|Blob) | required   | A File or Blob object |
+- `blob` _(Blob | File)_: The file or blob to convert.
 
 #### Example:
 
 ```js
-imageResizeCompress.blobToURL(file).then((url) => console.log(url));
+blobToURL(file).then((url) => console.log(url));
 ```
 
-### `urlToBlob(url) → {Promise(Blob)}`
+### `urlToBlob(url: string) → Promise<Blob>`
 
-#### Description:
-
-Converts a given url string to a Blob object.
+Fetches an image from a URL and converts it into a `Blob`.
 
 #### Parameters:
 
-| Name | Type   | Attributes | Description                        |
-| ---- | ------ | ---------- | ---------------------------------- |
-| url  | string | required   | A dataUrl or an external image url |
+- **url** (_string_): The URL of the image.
 
 #### Example:
 
 ```js
-imageResizeCompress.urlToBlob(url).then((file) => console.log(file));
+urlToBlob('https://example.com/image.png').then((blob) => console.log(blob));
 ```
 
-### `fromBlob(file[, quality, width, height, format]) → {Promise(Blob)}`
+### `fromBlob(blob: Blob | File, quality?: number, width?: number | string, height?: number | string, format?: string) → Promise<Blob>`
 
-#### Description:
-
-Compresses, resizes and/or converts a given image File or Blob.
+Resizes, compresses, and/or converts a `Blob` or `File`.
 
 #### Parameters:
 
-| Name    | Type             | Attributes | Description                                                                                                                                                                                                                                                     |
-| ------- | ---------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| file    | (File\|Blob)     | required   | A File or Blob object                                                                                                                                                                                                                                           |
-| quality | string           | optional   | The quality of the output image. Only used for webp or jpeg formats.                                                                                                                                                                                            |
-| width   | (string\|number) | optional   | The width of the output image. If 0, the original width will be used. If 'auto', the width will be calculated based on the height of the image. If you have a 1280×720 image and set its height to 640 and width to 'auto', the output image will be 640×240.   |
-| height  | (string\|number) | optional   | The height of the output image. If 0, the original height will be used. If 'auto', the height will be calculated based on the width of the image. If you have a 1280×720 image and set its width to 240 and height to 'auto', the output image will be 640×240. |
-| format  | string           | optional   | The format of the output image. It can be png, jpeg, bmp, webp or gif. If you want a better compression, use webp format. If null, the source file format will be used.                                                                                         |
+- **blob** (_Blob | File_): The input file or blob.
+- **quality** (_number_): Compression quality (for webp or jpeg).
+- **width** (_number | string_): Target width (use `auto` to scale based on height).
+- **height** (_number | string_): Target height (use `auto` to scale based on width).
+- **format** (_string_): Desired format (e.g., jpeg, webp).
 
 #### Example:
 
 ```js
-fromBlob(blobFile).then((blob) => console.log(blob));
-// or
-fromBlob(blobFile, quality, width, height, format).then((blob) => console.log(blob));
+fromBlob(file, 80, 'auto', 100, 'jpeg').then((resizedBlob) =>
+  console.log(resizedBlob),
+);
 ```
 
-### `fromURL(url[, quality, width, height, format]) → {Promise(Blob)}`
+### `fromURL(url: string, quality?: number, width?: number | string, height?: number | string, format?: string) → Promise<Blob>`
 
-#### Description:
-
-Compresses, resizes and/or converts a given image url. Note that server must accept cors requests.
+Resizes, compresses, and/or converts an image from a URL.
 
 See [Cross-Origin Resource Sharing (CORS)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
 
 #### Parameters:
 
-| Name    | Type             | Attributes | Description                                                                                                                                                                                                                                                     |
-| ------- | ---------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| url     | string           | required   | The image URL                                                                                                                                                                                                                                                   |
-| quality | string           | optional   | The quality of the output image. Only used for webp or jpeg formats.                                                                                                                                                                                            |
-| width   | (string\|number) | optional   | The width of the output image. If 0, the original width will be used. If 'auto', the width will be calculated based on the height of the image. If you have a 1280×720 image and set its height to 640 and width to 'auto', the output image will be 640×240.   |
-| height  | (string\|number) | optional   | The height of the output image. If 0, the original height will be used. If 'auto', the height will be calculated based on the width of the image. If you have a 1280×720 image and set its width to 240 and height to 'auto', the output image will be 640×240. |
-| format  | string           | optional   | The format of the output image. It can be png, jpeg, bmp, webp or gif. If you want a better compression, use webp format. If null, the source file format will be used.                                                                                         |
+- **url** (_string_): The image URL.
+- **quality** (_number_): Compression quality (for webp or jpeg).
+- **width** (_number | string_): Target width (use `auto` to scale based on height).
+- **height** (_number | string_): Target height (use `auto` to scale based on width).
+- **format** (_string_): Desired format (e.g., jpeg, webp).
 
 #### Example:
 
 ```js
-fromURL(url).then((blob) => console.log(blob));
-// or
-fromURL(url, quality, width, height, format).then((blob) => console.log(blob));
+fromURL('https://example.com/image.png', 75, 200, 'auto', 'webp').then(
+  (resizedBlob) => console.log(resizedBlob),
+);
 ```
 
-## Compatibility
+## 🖥️ Compatibility
 
-IE and older browsers may not be compatible. Check [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise#Browser_compatibility) and [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API#Browser_compatibility) support.
+`image-resize-compress` supports most modern browsers. However:
 
-## License
+Older browsers (e.g., IE) may require polyfills for [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise#Browser_compatibility) and [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API#Browser_compatibility).
+
+## 📜 License
 
 [MIT](http://opensource.org/licenses/MIT)
+
+Feel free to contribute, report bugs, or suggest features! 🎉
