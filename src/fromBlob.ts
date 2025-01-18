@@ -34,7 +34,7 @@ const getHeightWidth = (
   const isHeightAuto = height === 'auto' || height === 0;
 
   if (!isWidthAuto && !isHeightAuto) {
-    return { width: img.naturalWidth, height: img.naturalHeight };
+    return { width, height };
   }
 
   if (!isWidthAuto) {
