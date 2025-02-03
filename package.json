@@ -1,6 +1,6 @@
 {
   "name": "image-resize-compress",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Image resizer, compressor, and converter built with modern TypeScript support",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
