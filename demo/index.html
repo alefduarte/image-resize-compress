@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>image-resize-compress — live demo</title>
+    <meta
+      name="description"
+      content="Resize, compress, and convert images in the browser with the image-resize-compress library."
+    />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #fbfbfd;
+        --panel: #ffffff;
+        --border: #e4e4e9;
+        --text: #1a1a1f;
+        --muted: #6b6b78;
+        --accent: #4c6ef5;
+        --accent-contrast: #ffffff;
+        --good: #2f9e44;
+        --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.04);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0f0f12;
+          --panel: #17171c;
+          --border: #2a2a33;
+          --text: #ececf1;
+          --muted: #9a9aa8;
+          --accent: #748ffc;
+          --accent-contrast: #0f0f12;
+          --good: #51cf66;
+          --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font:
+          15px/1.5 system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        padding: 2rem 1rem 4rem;
+      }
+      main {
+        max-width: 980px;
+        margin: 0 auto;
+      }
+      header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      h1 {
+        font-size: 1.7rem;
+        margin: 0 0 0.35rem;
+        letter-spacing: -0.02em;
+      }
+      header p {
+        margin: 0;
+        color: var(--muted);
+      }
+      header a {
+        color: var(--accent);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 1.25rem;
+        align-items: start;
+      }
+      @media (max-width: 720px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.25rem;
+        box-shadow: var(--shadow);
+      }
+      label {
+        display: block;
+        font-size: 0.82rem;
+        font-weight: 600;
+        margin: 0.9rem 0 0.3rem;
+      }
+      label:first-of-type {
+        margin-top: 0;
+      }
+      select,
+      input[type='number'],
+      input[type='text'] {
+        width: 100%;
+        padding: 0.5rem 0.6rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--bg);
+        color: var(--text);
+        font: inherit;
+      }
+      .row {
+        display: flex;
+        gap: 0.6rem;
+      }
+      .row > div {
+        flex: 1;
+      }
+      .range-row {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+      input[type='range'] {
+        flex: 1;
+        accent-color: var(--accent);
+      }
+      .range-val {
+        width: 3ch;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        color: var(--muted);
+      }
+      .check {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.9rem;
+        font-size: 0.9rem;
+      }
+      .check input {
+        accent-color: var(--accent);
+        width: 16px;
+        height: 16px;
+      }
+      .hint {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin: 0.2rem 0 0;
+      }
+      #drop {
+        border: 2px dashed var(--border);
+        border-radius: 14px;
+        padding: 2.5rem 1rem;
+        text-align: center;
+        color: var(--muted);
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+      }
+      #drop.over {
+        border-color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 8%, transparent);
+      }
+      #drop strong {
+        color: var(--text);
+      }
+      .previews {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 1.25rem;
+      }
+      @media (max-width: 520px) {
+        .previews {
+          grid-template-columns: 1fr;
+        }
+      }
+      figure {
+        margin: 0;
+      }
+      figcaption {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--muted);
+        margin-bottom: 0.4rem;
+        display: flex;
+        justify-content: space-between;
+      }
+      .imgwrap {
+        background: repeating-conic-gradient(
+            var(--border) 0 25%,
+            transparent 0 50%
+          )
+          50% / 16px 16px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        min-height: 140px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      .imgwrap img {
+        max-width: 100%;
+        max-height: 320px;
+        display: block;
+      }
+      .stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.25rem;
+        margin-top: 1rem;
+        font-size: 0.85rem;
+      }
+      .stats b {
+        font-variant-numeric: tabular-nums;
+      }
+      .saved {
+        color: var(--good);
+        font-weight: 700;
+      }
+      button {
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--text);
+        padding: 0.55rem 1rem;
+      }
+      button.primary {
+        background: var(--accent);
+        color: var(--accent-contrast);
+        border-color: transparent;
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .actions {
+        display: flex;
+        gap: 0.6rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+      }
+      .err {
+        color: #e03131;
+        font-size: 0.85rem;
+        margin-top: 0.75rem;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.85em;
+        background: color-mix(in srgb, var(--muted) 15%, transparent);
+        padding: 0.1em 0.35em;
+        border-radius: 4px;
+      }
+      footer {
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.8rem;
+        margin-top: 2.5rem;
+      }
+      footer a {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>image-resize-compress</h1>
+        <p>
+          Resize, compress &amp; convert images in the browser — zero
+          dependencies.
+          <a href="https://github.com/alefduarte/image-resize-compress"
+            >GitHub</a
+          >
+          ·
+          <a href="https://www.npmjs.com/package/image-resize-compress">npm</a>
+        </p>
+      </header>
+
+      <div class="grid">
+        <section class="panel" aria-label="Options">
+          <label for="format">Output format</label>
+          <select id="format">
+            <option value="">Keep original</option>
+            <option value="jpeg">JPEG</option>
+            <option value="webp" selected>WebP</option>
+            <option value="png">PNG</option>
+          </select>
+
+          <label for="quality"
+            >Quality <span class="hint">(jpeg/webp)</span></label
+          >
+          <div class="range-row">
+            <input id="quality" type="range" min="1" max="100" value="80" />
+            <span class="range-val" id="qualityVal">80</span>
+          </div>
+
+          <label>Dimensions</label>
+          <div class="row">
+            <div>
+              <input id="width" type="number" min="1" placeholder="width" />
+            </div>
+            <div>
+              <input id="height" type="number" min="1" placeholder="height" />
+            </div>
+          </div>
+          <p class="hint">Leave blank for auto (keeps aspect ratio).</p>
+
+          <label for="maxEdge">Max width or height</label>
+          <input id="maxEdge" type="number" min="1" placeholder="e.g. 1024" />
+          <p class="hint">Caps the longest edge. Overrides width/height.</p>
+
+          <label for="targetSize">Target size (KB)</label>
+          <input id="targetSize" type="number" min="1" placeholder="e.g. 100" />
+          <p class="hint">Binary-searches quality (jpeg/webp only).</p>
+
+          <label for="bg">Background color</label>
+          <input id="bg" type="text" placeholder="#ffffff (flatten alpha)" />
+
+          <label class="check" for="worker">
+            <input id="worker" type="checkbox" />
+            Process in a Web Worker (off main thread)
+          </label>
+        </section>
+
+        <section>
+          <div id="drop" tabindex="0" role="button">
+            <strong>Drop an image here</strong> or click to choose<br />
+            <span class="hint"
+              >Nothing is uploaded — all processing is local.</span
+            >
+            <input id="file" type="file" accept="image/*" hidden />
+          </div>
+
+          <div class="previews">
+            <figure>
+              <figcaption>
+                <span>Original</span><span id="origInfo"></span>
+              </figcaption>
+              <div class="imgwrap"><img id="origImg" alt="" /></div>
+            </figure>
+            <figure>
+              <figcaption>
+                <span>Result</span><span id="outInfo"></span>
+              </figcaption>
+              <div class="imgwrap"><img id="outImg" alt="" /></div>
+            </figure>
+          </div>
+
+          <div class="stats" id="stats" hidden>
+            <span>Original: <b id="sizeOrig">–</b></span>
+            <span>Result: <b id="sizeOut">–</b></span>
+            <span id="savedWrap">Saved: <b class="saved" id="saved">–</b></span>
+            <span>Took: <b id="took">–</b></span>
+          </div>
+
+          <div class="actions">
+            <button id="download" class="primary" disabled>
+              Download result
+            </button>
+            <button id="reset" disabled>Reset</button>
+          </div>
+
+          <div class="err" id="err" hidden></div>
+        </section>
+      </div>
+
+      <footer>
+        Built with
+        <a href="https://www.npmjs.com/package/image-resize-compress"
+          ><code>image-resize-compress</code></a
+        >
+        (v3, loaded from jsDelivr CDN).
+      </footer>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/image-resize-compress@3/dist/index.global.js"></script>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const fmtBytes = (n) =>
+        n < 1024
+          ? n + ' B'
+          : n < 1048576
+            ? (n / 1024).toFixed(1) + ' KB'
+            : (n / 1048576).toFixed(2) + ' MB';
+
+      let currentFile = null;
+      let resultUrl = null;
+      let resultBlob = null;
+      let debounce;
+
+      $('quality').addEventListener('input', () => {
+        $('qualityVal').textContent = $('quality').value;
+      });
+
+      // ---- file intake ----
+      const drop = $('drop');
+      drop.addEventListener('click', () => $('file').click());
+      drop.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') $('file').click();
+      });
+      $('file').addEventListener('change', (e) => loadFile(e.target.files[0]));
+      ['dragenter', 'dragover'].forEach((ev) =>
+        drop.addEventListener(ev, (e) => {
+          e.preventDefault();
+          drop.classList.add('over');
+        }),
+      );
+      ['dragleave', 'drop'].forEach((ev) =>
+        drop.addEventListener(ev, (e) => {
+          e.preventDefault();
+          drop.classList.remove('over');
+        }),
+      );
+      drop.addEventListener('drop', (e) => loadFile(e.dataTransfer.files[0]));
+
+      function loadFile(file) {
+        if (!file || !file.type.startsWith('image/')) return;
+        currentFile = file;
+        $('origImg').src = URL.createObjectURL(file);
+        $('origImg').onload = () => {
+          $('origInfo').textContent =
+            $('origImg').naturalWidth + '×' + $('origImg').naturalHeight;
+        };
+        $('sizeOrig').textContent = fmtBytes(file.size);
+        $('reset').disabled = false;
+        process();
+      }
+
+      // reprocess when any control changes
+      [
+        'format',
+        'quality',
+        'width',
+        'height',
+        'maxEdge',
+        'targetSize',
+        'bg',
+        'worker',
+      ].forEach((id) =>
+        $(id).addEventListener('input', () => {
+          clearTimeout(debounce);
+          debounce = setTimeout(process, 250);
+        }),
+      );
+
+      async function process() {
+        if (!currentFile) return;
+        $('err').hidden = true;
+        const opts = {};
+        const fmt = $('format').value;
+        if (fmt) opts.format = fmt;
+        opts.quality = Number($('quality').value);
+        if ($('width').value) opts.width = Number($('width').value);
+        if ($('height').value) opts.height = Number($('height').value);
+        if ($('maxEdge').value)
+          opts.maxWidthOrHeight = Number($('maxEdge').value);
+        if ($('targetSize').value)
+          opts.targetSize = Number($('targetSize').value) * 1024;
+        if ($('bg').value) opts.backgroundColor = $('bg').value;
+        if ($('worker').checked) opts.worker = true;
+
+        const t0 = performance.now();
+        try {
+          const blob = await imageResizeCompress.fromBlob(currentFile, opts);
+          const took = Math.round(performance.now() - t0);
+          if (resultUrl) URL.revokeObjectURL(resultUrl);
+          resultBlob = blob;
+          resultUrl = URL.createObjectURL(blob);
+          const img = $('outImg');
+          img.src = resultUrl;
+          img.onload = () =>
+            ($('outInfo').textContent =
+              img.naturalWidth + '×' + img.naturalHeight);
+          $('sizeOut').textContent = fmtBytes(blob.size);
+          const pct = (1 - blob.size / currentFile.size) * 100;
+          $('saved').textContent =
+            (pct >= 0 ? '−' : '+') + Math.abs(pct).toFixed(1) + '%';
+          $('savedWrap').style.display = pct >= 0 ? '' : 'none';
+          $('took').textContent = took + ' ms';
+          $('stats').hidden = false;
+          $('download').disabled = false;
+        } catch (err) {
+          $('err').hidden = false;
+          $('err').textContent = err.name + ': ' + err.message;
+        }
+      }
+
+      $('download').addEventListener('click', () => {
+        if (!resultBlob) return;
+        const a = document.createElement('a');
+        a.href = resultUrl;
+        const ext = (resultBlob.type.split('/')[1] || 'img').replace(
+          'jpeg',
+          'jpg',
+        );
+        a.download = 'resized.' + ext;
+        a.click();
+      });
+
+      $('reset').addEventListener('click', () => {
+        currentFile = resultBlob = null;
+        if (resultUrl) URL.revokeObjectURL(resultUrl);
+        $('origImg').removeAttribute('src');
+        $('outImg').removeAttribute('src');
+        $('origInfo').textContent = $('outInfo').textContent = '';
+        $('stats').hidden = true;
+        $('download').disabled = $('reset').disabled = true;
+        $('file').value = '';
+      });
+    </script>
+  </body>
+</html>
