@@ -153,28 +153,28 @@ Repo → **Settings** → **General** → **Pull Requests**:
 Repo → **Settings** → **Branches** → **Add branch ruleset** (or classic
 **Branch protection rule**) targeting `master`:
 
-- [ ] **Require status checks to pass before merging** → add the **`Verify`**
-      check from the CI workflow (its job name; appears in the list after the
-      CI workflow has run at least once on a PR).
+- [x] **Require status checks to pass before merging** → `Verify` (GitHub
+      Actions) added to the ruleset via API on 2026-07-22.
 - [x] **Require a pull request before merging** (no direct pushes by humans).
+      Review requirements set to zero approvals / no code-owner review / no
+      last-push approval — a solo maintainer cannot approve their own PRs
+      (GitHub ignores author approvals), so any review requirement would
+      deadlock every PR. The real gates are the required `Verify` check and
+      the PR-title check.
 - [x] **Do not allow force pushes.**
 - [x] **Do not allow deletions.**
 
-> **CRITICAL — semantic-release vs. branch protection.** The
-> `@semantic-release/git` plugin pushes the CHANGELOG + version-bump commit
-> **directly to `master`** using `GITHUB_TOKEN`. If "Require a pull request
-> before merging" is on, that push is **rejected** and every release fails at
-> the git step. Choose one:
->
-> - Use a **repository ruleset** and add the release automation to the
->   **bypass list** (Ruleset → **Bypass list** → add the repo's GitHub Actions
->   / the release actor), **or**
-> - Do not require a PR (keep only "require status checks" + "no force push"),
->   relying on squash-only + required checks to gate humans.
->
-> The `[skip ci]` in the release commit message stops the pushed commit from
-> retriggering CI, but it does **not** exempt it from branch protection — the
-> bypass above is still required if PRs are mandated.
+> **RESOLVED — semantic-release vs. branch protection.** The original plan
+> (`@semantic-release/git` pushing a CHANGELOG + version commit to `master`)
+> conflicted with "require a pull request", and GitHub does **not** allow
+> adding the GitHub Actions app to a ruleset bypass list on a personal repo
+> (API rejects: "Actor GitHub Actions integration must be part of the ruleset
+> source or owner organization"). Resolution (2026-07-22): dropped the
+> `@semantic-release/git` and `@semantic-release/changelog` plugins entirely.
+> Nothing pushes to `master` during a release; release notes live in the
+> GitHub Release, and `@semantic-release/npm` injects the version into the
+> published tarball. The in-repo `package.json` version stays stale by design
+> — never hand-bump it.
 
 ### 4c. Actions default permissions
 
@@ -215,9 +215,9 @@ After the first `feat!:` squash merge triggers a release:
 - [ ] npmjs.com package page shows the green **Provenance** badge on `3.0.0`.
 - [ ] `npm audit signatures` (in a fresh install of the package) reports the
       release as **attested**.
-- [ ] `CHANGELOG.md` was generated and committed by the bot with
-      `chore(release): 3.0.0 [skip ci]`.
-- [ ] A **GitHub Release** for `v3.0.0` exists with generated notes.
+- [ ] A **GitHub Release** for `v3.0.0` exists with generated notes (this is
+      the changelog — no `CHANGELOG.md` is committed; the git/changelog
+      plugins were removed, see §4b).
 - [ ] **No `NPM_TOKEN`** remains in repo secrets (if trusted publishing worked).
 - [ ] Deliberately push a red PR (failing test/lint/size) and confirm the
       required **`Verify`** check blocks merge; then revert.
