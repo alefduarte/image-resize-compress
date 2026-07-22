@@ -100,8 +100,9 @@ jobs:
         run: pnpm build
 
       # Node 22 ships npm 10.9.x; trusted publishing (OIDC) needs npm >= 11.5.
+      # Pin to the 11.x line so a future npm major cannot silently break releases.
       - name: Upgrade npm for trusted publishing + provenance
-        run: npm install -g npm@latest
+        run: npm install -g 'npm@^11.5.0'
 
       - name: Release
         run: npx semantic-release

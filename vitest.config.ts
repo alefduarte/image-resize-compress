@@ -48,8 +48,14 @@ const fixtureServer = (): Plugin => ({
       if (url.startsWith('/fixtures/')) {
         const name = decodeURIComponent(url.slice('/fixtures/'.length));
         const filePath = path.join(fixturesDir, name);
-        // Reject path traversal outside the fixtures directory.
-        if (!path.resolve(filePath).startsWith(path.resolve(fixturesDir))) {
+        // Reject path traversal outside the fixtures directory. `path.relative`
+        // enforces a segment boundary, so a sibling like `../fixtures2` (which
+        // shares the `fixtures` prefix) is not mistaken for a child.
+        const rel = path.relative(
+          path.resolve(fixturesDir),
+          path.resolve(filePath),
+        );
+        if (rel.startsWith('..') || path.isAbsolute(rel)) {
           res.statusCode = 403;
           res.end('Forbidden');
           return;

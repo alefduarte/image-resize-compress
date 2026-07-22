@@ -1,3 +1,4 @@
+import { assertBrowserEnv } from './decode';
 import { InvalidImageError } from './errors';
 
 /**
@@ -6,12 +7,16 @@ import { InvalidImageError } from './errors';
  * @param blob The blob or file to convert.
  * @returns A promise resolving to a data URL string.
  */
-const blobToURL = (blob: Blob | File): Promise<string> => {
+const blobToURL = async (blob: Blob | File): Promise<string> => {
+  // FileReader is browser-only; fail fast with EnvironmentError in SSR/Node
+  // instead of a cryptic ReferenceError. `async` turns each throw into a
+  // rejection, so no per-check Promise.reject wrapper is needed.
+  assertBrowserEnv();
   if (!(blob instanceof Blob)) {
-    return Promise.reject(new TypeError('Expected a Blob or File'));
+    throw new TypeError('Expected a Blob or File');
   }
   if (blob.size === 0) {
-    return Promise.reject(new InvalidImageError('Image is empty (0 bytes)'));
+    throw new InvalidImageError('Image is empty (0 bytes)');
   }
 
   return new Promise<string>((resolve, reject) => {
