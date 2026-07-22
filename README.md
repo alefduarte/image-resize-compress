@@ -12,8 +12,10 @@ Releases are published from CI with [npm provenance](https://docs.npmjs.com/gene
 (the green **Provenance** badge on [npmjs.com](https://www.npmjs.com/package/image-resize-compress)),
 so you get cryptographic proof each tarball was built from this repository.
 
-> ✨ [Demo](https://alefduarte.github.io/image-resize-compress-demo/) — note: the
-> hosted demo still targets the **v2** API and has not been updated for v3 yet.
+> ✨ [Live demo](https://alefduarte.github.io/image-resize-compress/) — drag in an
+> image and try resizing, compression, format conversion, `targetSize`, and the
+> worker option. Everything runs locally; nothing is uploaded. Source in
+> [`demo/`](demo/index.html).
 
 ## Why this over browser-image-compression?
 
