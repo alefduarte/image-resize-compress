@@ -17,3 +17,7 @@ CHANGELOG.md
 
 # Dependencies
 node_modules/
+
+# Demo playground — kept byte-stable so CodeQL's (dismissed) false-positive
+# alert on the object-URL preview isn't re-fingerprinted on every reformat.
+demo/
