@@ -1,29 +1,30 @@
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-/**
- * Convert File or Blob to DataURL
- *
- * @param {Blob | File} blob Blob or File to convert.
- * @returns {Promise<string | ArrayBuffer>} Promise resolving to a DataURL string.
- */
-const blobToURL = (blob: Blob | File): Promise<string | ArrayBuffer> => {
-  return new Promise((resolve, reject) => {
-    if (blob.size === 0) {
-      return reject(new Error('Cannot convert empty Blob.'));
-    }
-    if (blob.size > MAX_FILE_SIZE) {
-      return reject(new Error('File size exceeds the maximum allowed limit.'));
-    }
-    const reader = new FileReader();
+import { InvalidImageError } from './errors';
 
+/**
+ * Convert a File or Blob to a data URL.
+ *
+ * @param blob The blob or file to convert.
+ * @returns A promise resolving to a data URL string.
+ */
+const blobToURL = (blob: Blob | File): Promise<string> => {
+  if (!(blob instanceof Blob)) {
+    return Promise.reject(new TypeError('Expected a Blob or File'));
+  }
+  if (blob.size === 0) {
+    return Promise.reject(new InvalidImageError('Image is empty (0 bytes)'));
+  }
+
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
     reader.onloadend = () => {
-      if (reader.result) {
+      if (typeof reader.result === 'string') {
         resolve(reader.result);
       } else {
-        reject(new Error('Failed to convert blob to DataURL.'));
+        reject(new InvalidImageError('Failed to convert blob to data URL'));
       }
     };
-
-    reader.onerror = () => reject(new Error('Error reading blob.'));
+    reader.onerror = () =>
+      reject(new InvalidImageError('Failed to read blob', { cause: reader.error }));
     reader.readAsDataURL(blob);
   });
 };

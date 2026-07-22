@@ -7,6 +7,22 @@ import fromBlob from './fromBlob';
 import fromURL from './fromURL';
 import blobToURL from './blobToURL';
 import urlToBlob from './urlToBlob';
-import { Size, ImageFormat } from './types';
 
-export { fromBlob, fromURL, blobToURL, urlToBlob, Size, ImageFormat };
+export { fromBlob, fromURL, blobToURL, urlToBlob };
+
+export type {
+  ImageFormat,
+  LegacyFormat,
+  ResizeOptions,
+  FromURLOptions,
+  Size,
+} from './types';
+
+export {
+  ImageProcessError,
+  InvalidImageError,
+  UnsupportedFormatError,
+  ImageTooLargeError,
+  FetchError,
+  EnvironmentError,
+} from './errors';
