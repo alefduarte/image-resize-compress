@@ -72,17 +72,17 @@ semantic-release analyzes. It must carry a breaking-change marker:
 Gives the release workflow token-free publishing. There is no `NPM_TOKEN`
 secret to steal.
 
-- [ ] Sign in at <https://www.npmjs.com> as the package owner.
-- [ ] Go to the package page: <https://www.npmjs.com/package/image-resize-compress>
-- [ ] Click **Settings** (package settings tab).
-- [ ] Find **Trusted Publisher** → **GitHub Actions** → **Add**.
-- [ ] Enter exactly:
+- [x] Sign in at <https://www.npmjs.com> as the package owner.
+- [x] Go to the package page: <https://www.npmjs.com/package/image-resize-compress>
+- [x] Click **Settings** (package settings tab).
+- [x] Find **Trusted Publisher** → **GitHub Actions** → **Add**.
+- [x] Enter exactly:
   - **Organization or user:** `alefduarte`
   - **Repository:** `image-resize-compress`
   - **Workflow filename:** `release.yml`
   - **Environment:** leave **blank** (the release job does not use a GitHub
     Environment).
-- [ ] Save.
+- [x] Save.
 
 Result: `release.yml` (which already has `id-token: write` and runs
 `npm i -g npm@latest` to get npm ≥ 11.5) authenticates via short-lived OIDC.
@@ -97,10 +97,10 @@ Result: `release.yml` (which already has `id-token: write` and runs
 
 If npm org/account settings block trusted publishing:
 
-- [ ] npmjs.com → **Access Tokens** → **Generate New Token** → **Granular
+- [x] npmjs.com → **Access Tokens** → **Generate New Token** → **Granular
       Access Token**, scoped to **only** the `image-resize-compress` package,
       **Read and write**, short expiry.
-- [ ] GitHub repo → **Settings** → **Secrets and variables** → **Actions** →
+- [x] GitHub repo → **Settings** → **Secrets and variables** → **Actions** →
       **New repository secret**, name **`NPM_TOKEN`**.
 - [ ] Add `NPM_TOKEN: ${{ secrets.NPM_TOKEN }}` to the `env:` of the **Release**
       step in `.github/workflows/release.yml`.
@@ -131,11 +131,22 @@ Prefer trusted publishing; delete the token (section 3) once OIDC works.
 
 Repo → **Settings** → **General** → **Pull Requests**:
 
-- [ ] Enable **Allow squash merging**.
-- [ ] Under squash merging, set **default commit message** to **"Pull request
+- [x] Enable **Allow squash merging**.
+- [x] Under squash merging, set **default commit message** to **"Pull request
       title"** (so the enforced PR title lands verbatim as the squash commit).
 - [ ] **Disable Allow merge commits.**
 - [ ] **Disable Allow rebase merging.**
+
+> **Why squash-only:** semantic-release computes versions and the changelog
+> from the commits that land on `master`. The pipeline's guarantee is that the
+> only commit landing there is the squash commit whose message = the PR title,
+> already validated by the `pr-title.yml` check. A **merge commit** brings all
+> individual (unvalidated — commitlint deliberately skips them) PR commits
+> onto master: a stray `fix:` in WIP commits triggers an unintended release, a
+> mistaken `feat!:` triggers a major bump, and noise pollutes the changelog.
+> A **rebase merge** is worse: it replays every unvalidated commit verbatim
+> and the validated PR title never lands at all. Squash-only = exactly one
+> validated conventional commit per PR.
 
 ### 4b. Branch protection on `master` (BEFORE FIRST MERGE)
 
@@ -145,9 +156,9 @@ Repo → **Settings** → **Branches** → **Add branch ruleset** (or classic
 - [ ] **Require status checks to pass before merging** → add the **`Verify`**
       check from the CI workflow (its job name; appears in the list after the
       CI workflow has run at least once on a PR).
-- [ ] **Require a pull request before merging** (no direct pushes by humans).
-- [ ] **Do not allow force pushes.**
-- [ ] **Do not allow deletions.**
+- [x] **Require a pull request before merging** (no direct pushes by humans).
+- [x] **Do not allow force pushes.**
+- [x] **Do not allow deletions.**
 
 > **CRITICAL — semantic-release vs. branch protection.** The
 > `@semantic-release/git` plugin pushes the CHANGELOG + version-bump commit
@@ -169,10 +180,10 @@ Repo → **Settings** → **Branches** → **Add branch ruleset** (or classic
 
 Repo → **Settings** → **Actions** → **General**:
 
-- [ ] **Workflow permissions** → select **Read repository contents and packages
+- [x] **Workflow permissions** → select **Read repository contents and packages
       permissions** (default `GITHUB_TOKEN` read-only). The workflows request
       the writes they need explicitly via per-job `permissions:`.
-- [ ] **Fork pull request workflows from outside collaborators** → set to
+- [x] **Fork pull request workflows from outside collaborators** → set to
       **Require approval for all outside collaborators** (or all external
       contributors).
 
@@ -180,12 +191,12 @@ Repo → **Settings** → **Actions** → **General**:
 
 Repo → **Settings** → **Security** (or **Code security and analysis**):
 
-- [ ] Enable **Private vulnerability reporting**. `SECURITY.md` already points
+- [x] Enable **Private vulnerability reporting**. `SECURITY.md` already points
       contributors to the Security tab's "Report a vulnerability" flow.
 
 ### 4e. Discussions (needed by spec 07)
 
-- [ ] Repo → **Settings** → **General** → **Features** → enable
+- [x] Repo → **Settings** → **General** → **Features** → enable
       **Discussions**. Spec 07 routes the issue-template contact link to
       Discussions so bug issues stay actionable; the link is dead until
       Discussions is on.
