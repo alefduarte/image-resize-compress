@@ -34,6 +34,8 @@ describe('targetSize (binary-searched quality)', () => {
   it('rejects targetSize when the resolved output format is png', async () => {
     const png = await loadFixture('tiny-1x1.png');
     // no explicit format → input type (png) is used → png cannot honor targetSize
-    await expect(fromBlob(png, { targetSize: 5_000 })).rejects.toBeInstanceOf(RangeError);
+    await expect(fromBlob(png, { targetSize: 5_000 })).rejects.toBeInstanceOf(
+      RangeError,
+    );
   });
 });

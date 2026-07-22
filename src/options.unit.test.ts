@@ -55,7 +55,9 @@ describe('normalizeOptions — validation rows (spec 01 table)', () => {
     'rejects quality %p with RangeError',
     (q) => {
       expect(() => normalizeOptions({ quality: q })).toThrow(RangeError);
-      expect(() => normalizeOptions({ quality: q })).toThrow('quality must be a number in (0, 100]');
+      expect(() => normalizeOptions({ quality: q })).toThrow(
+        'quality must be a number in (0, 100]',
+      );
     },
   );
 
@@ -70,43 +72,65 @@ describe('normalizeOptions — validation rows (spec 01 table)', () => {
   });
 
   it.each([0, -5, Number.NaN])('rejects width %p', (w) => {
-    expect(() => normalizeOptions({ width: w })).toThrow("width must be 'auto' or a number > 0");
+    expect(() => normalizeOptions({ width: w })).toThrow(
+      "width must be 'auto' or a number > 0",
+    );
   });
 
   it.each([0, -5, Number.NaN])('rejects height %p', (h) => {
-    expect(() => normalizeOptions({ height: h })).toThrow("height must be 'auto' or a number > 0");
+    expect(() => normalizeOptions({ height: h })).toThrow(
+      "height must be 'auto' or a number > 0",
+    );
   });
 
   it('rejects maxWidthOrHeight <= 0 / non-finite', () => {
-    expect(() => normalizeOptions({ maxWidthOrHeight: 0 })).toThrow('maxWidthOrHeight must be a number > 0');
-    expect(() => normalizeOptions({ maxWidthOrHeight: Number.NaN })).toThrow('maxWidthOrHeight must be a number > 0');
+    expect(() => normalizeOptions({ maxWidthOrHeight: 0 })).toThrow(
+      'maxWidthOrHeight must be a number > 0',
+    );
+    expect(() => normalizeOptions({ maxWidthOrHeight: Number.NaN })).toThrow(
+      'maxWidthOrHeight must be a number > 0',
+    );
   });
 
   it('rejects maxWidthOrHeight combined with an explicit width or height', () => {
-    expect(() => normalizeOptions({ maxWidthOrHeight: 100, width: 200 })).toThrow(
-      'maxWidthOrHeight cannot be combined with width/height',
-    );
-    expect(() => normalizeOptions({ maxWidthOrHeight: 100, height: 200 })).toThrow(
-      'maxWidthOrHeight cannot be combined with width/height',
-    );
+    expect(() =>
+      normalizeOptions({ maxWidthOrHeight: 100, width: 200 }),
+    ).toThrow('maxWidthOrHeight cannot be combined with width/height');
+    expect(() =>
+      normalizeOptions({ maxWidthOrHeight: 100, height: 200 }),
+    ).toThrow('maxWidthOrHeight cannot be combined with width/height');
   });
 
   it('allows maxWidthOrHeight with explicit auto dimensions', () => {
-    expect(normalizeOptions({ maxWidthOrHeight: 100, width: 'auto', height: 'auto' })).toMatchObject({
+    expect(
+      normalizeOptions({
+        maxWidthOrHeight: 100,
+        width: 'auto',
+        height: 'auto',
+      }),
+    ).toMatchObject({
       maxWidthOrHeight: 100,
     });
   });
 
   it('rejects an unknown format with UnsupportedFormatError', () => {
     // @ts-expect-error intentional bad input
-    expect(() => normalizeOptions({ format: 'bmp' })).toThrow(UnsupportedFormatError);
+    expect(() => normalizeOptions({ format: 'bmp' })).toThrow(
+      UnsupportedFormatError,
+    );
     // @ts-expect-error intentional bad input
-    expect(() => normalizeOptions({ format: 'tiff' })).toThrow("Unsupported format 'tiff'");
+    expect(() => normalizeOptions({ format: 'tiff' })).toThrow(
+      "Unsupported format 'tiff'",
+    );
   });
 
   it('rejects targetSize <= 0 / non-finite with RangeError', () => {
-    expect(() => normalizeOptions({ targetSize: 0 })).toThrow('targetSize must be a number of bytes > 0');
-    expect(() => normalizeOptions({ targetSize: Number.NaN })).toThrow('targetSize must be a number of bytes > 0');
+    expect(() => normalizeOptions({ targetSize: 0 })).toThrow(
+      'targetSize must be a number of bytes > 0',
+    );
+    expect(() => normalizeOptions({ targetSize: Number.NaN })).toThrow(
+      'targetSize must be a number of bytes > 0',
+    );
   });
 
   it('rejects targetSize with png output', () => {
@@ -116,14 +140,18 @@ describe('normalizeOptions — validation rows (spec 01 table)', () => {
   });
 
   it('allows targetSize with jpeg/webp', () => {
-    expect(normalizeOptions({ targetSize: 1000, format: 'jpeg' }).targetSize).toBe(1000);
+    expect(
+      normalizeOptions({ targetSize: 1000, format: 'jpeg' }).targetSize,
+    ).toBe(1000);
   });
 
   it('rejects a non-boolean worker with TypeError', () => {
     // @ts-expect-error intentional bad input
     expect(() => normalizeOptions({ worker: 'yes' })).toThrow(TypeError);
     // @ts-expect-error intentional bad input
-    expect(() => normalizeOptions({ worker: 'yes' })).toThrow('worker must be a boolean');
+    expect(() => normalizeOptions({ worker: 'yes' })).toThrow(
+      'worker must be a boolean',
+    );
   });
 });
 
@@ -135,13 +163,22 @@ describe('resolveFromBlobArgs — new vs legacy detection', () => {
   });
 
   it('treats no args as the new path', () => {
-    expect(resolveFromBlobArgs()).toMatchObject({ width: 'auto', height: 'auto' });
+    expect(resolveFromBlobArgs()).toMatchObject({
+      width: 'auto',
+      height: 'auto',
+    });
     expect(warnSpy).not.toHaveBeenCalled();
   });
 
   it('treats a numeric second arg as legacy', () => {
     const out = resolveFromBlobArgs(80, 100, 'auto', 'webp', '#fff');
-    expect(out).toMatchObject({ quality: 80, width: 100, height: 'auto', format: 'webp', backgroundColor: '#fff' });
+    expect(out).toMatchObject({
+      quality: 80,
+      width: 100,
+      height: 'auto',
+      format: 'webp',
+      backgroundColor: '#fff',
+    });
   });
 
   it('treats a later positional arg as legacy even when quality is omitted', () => {
@@ -174,22 +211,35 @@ describe('legacy dimension + format mapping', () => {
   });
 
   it('keeps positive legacy dimensions', () => {
-    expect(resolveFromBlobArgs(80, 320, 240)).toMatchObject({ width: 320, height: 240 });
+    expect(resolveFromBlobArgs(80, 320, 240)).toMatchObject({
+      width: 320,
+      height: 240,
+    });
   });
 
-  it.each(['bmp', 'gif'] as const)('throws UnsupportedFormatError for legacy format %s', (fmt) => {
-    expect(() => resolveFromBlobArgs(80, 'auto', 'auto', fmt)).toThrow(UnsupportedFormatError);
-  });
+  it.each(['bmp', 'gif'] as const)(
+    'throws UnsupportedFormatError for legacy format %s',
+    (fmt) => {
+      expect(() => resolveFromBlobArgs(80, 'auto', 'auto', fmt)).toThrow(
+        UnsupportedFormatError,
+      );
+    },
+  );
 
   it('maps a null legacy format to undefined', () => {
-    expect(resolveFromBlobArgs(80, 'auto', 'auto', null).format).toBeUndefined();
+    expect(
+      resolveFromBlobArgs(80, 'auto', 'auto', null).format,
+    ).toBeUndefined();
   });
 });
 
 describe('resolveFromURLArgs', () => {
   it('splits fetchOptions from resize options on the new path', () => {
     const fetchOptions = { headers: { accept: 'image/*' } };
-    const { resize, fetchOptions: fo } = resolveFromURLArgs({ quality: 70, fetchOptions });
+    const { resize, fetchOptions: fo } = resolveFromURLArgs({
+      quality: 70,
+      fetchOptions,
+    });
     expect(resize).toMatchObject({ quality: 70 });
     expect(fo).toBe(fetchOptions);
     expect(warnSpy).not.toHaveBeenCalled();
@@ -203,7 +253,13 @@ describe('resolveFromURLArgs', () => {
 
   it('maps legacy positional args, treating arg6 as fetchOptions', () => {
     const fetchOptions = { credentials: 'include' as const };
-    const { resize, fetchOptions: fo } = resolveFromURLArgs(0.5, 200, 'auto', 'webp', fetchOptions);
+    const { resize, fetchOptions: fo } = resolveFromURLArgs(
+      0.5,
+      200,
+      'auto',
+      'webp',
+      fetchOptions,
+    );
     expect(resize).toMatchObject({ quality: 50, width: 200, format: 'webp' });
     expect(fo).toBe(fetchOptions);
   });
@@ -218,7 +274,9 @@ describe('deprecation warning fires at most once per module', () => {
     fresh.resolveFromBlobArgs(50, 100);
     fresh.resolveFromURLArgs(30);
     expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy.mock.calls[0][0]).toContain('Positional arguments are deprecated');
+    expect(spy.mock.calls[0][0]).toContain(
+      'Positional arguments are deprecated',
+    );
     spy.mockRestore();
   });
 });

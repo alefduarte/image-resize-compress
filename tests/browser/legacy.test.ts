@@ -16,7 +16,9 @@ describe('legacy positional overload', () => {
     expect(out.type).toBe('image/webp');
     expect(await decodeDims(out)).toEqual({ width: 100, height: 75 });
     expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.mock.calls[0][0]).toContain('Positional arguments are deprecated');
+    expect(warn.mock.calls[0][0]).toContain(
+      'Positional arguments are deprecated',
+    );
 
     warn.mockRestore();
   });

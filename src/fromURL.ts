@@ -1,5 +1,10 @@
 import type { FromURLOptions, LegacyFormat } from './types';
-import { InvalidImageError, isAbortError, httpError, networkError } from './errors';
+import {
+  InvalidImageError,
+  isAbortError,
+  httpError,
+  networkError,
+} from './errors';
 import { resolveFromURLArgs } from './options';
 import { isImageMime } from './mime';
 import { assertBrowserEnv } from './decode';
@@ -39,7 +44,13 @@ async function fromURL(
     throw new TypeError('url must be a non-empty string');
   }
 
-  const { resize, fetchOptions } = resolveFromURLArgs(arg2, arg3, arg4, arg5, arg6);
+  const { resize, fetchOptions } = resolveFromURLArgs(
+    arg2,
+    arg3,
+    arg4,
+    arg5,
+    arg6,
+  );
   const signal = resize.signal ?? fetchOptions?.signal ?? undefined;
 
   let response: Response;
@@ -59,7 +70,9 @@ async function fromURL(
   // A 200 HTML error page should fail clearly, not as a cryptic decode error.
   // Empty/generic types fall through to decode(), which throws InvalidImageError.
   if (blob.type && !isImageMime(blob.type)) {
-    throw new InvalidImageError(`URL did not return an image (got ${blob.type})`);
+    throw new InvalidImageError(
+      `URL did not return an image (got ${blob.type})`,
+    );
   }
 
   return processBlob(blob, { ...resize, signal });

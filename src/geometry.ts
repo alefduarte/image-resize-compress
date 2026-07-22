@@ -33,7 +33,10 @@ export const resolveSize = (natural: Size, opts: SizeOptions): Size => {
       return { width: round(natural.width), height: round(natural.height) };
     }
     const scale = maxWidthOrHeight / longest;
-    return { width: round(natural.width * scale), height: round(natural.height * scale) };
+    return {
+      width: round(natural.width * scale),
+      height: round(natural.height * scale),
+    };
   }
 
   const autoW = width === 'auto';
@@ -43,10 +46,16 @@ export const resolveSize = (natural: Size, opts: SizeOptions): Size => {
     return { width: round(width), height: round(height) };
   }
   if (!autoW) {
-    return { width: round(width), height: round(natural.height * (width / natural.width)) };
+    return {
+      width: round(width),
+      height: round(natural.height * (width / natural.width)),
+    };
   }
   if (!autoH) {
-    return { width: round(natural.width * (height / natural.height)), height: round(height) };
+    return {
+      width: round(natural.width * (height / natural.height)),
+      height: round(height),
+    };
   }
   return { width: round(natural.width), height: round(natural.height) };
 };

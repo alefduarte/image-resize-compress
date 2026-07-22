@@ -39,7 +39,9 @@ const fixtureServer = (): Plugin => ({
       if (url.startsWith('/__test__/html')) {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        res.end('<!doctype html><title>error page</title><h1>Not an image</h1>');
+        res.end(
+          '<!doctype html><title>error page</title><h1>Not an image</h1>',
+        );
         return;
       }
 
@@ -55,7 +57,10 @@ const fixtureServer = (): Plugin => ({
         readFile(filePath).then(
           (data) => {
             res.statusCode = 200;
-            res.setHeader('Content-Type', EXTENSION_MIME[path.extname(name)] ?? 'application/octet-stream');
+            res.setHeader(
+              'Content-Type',
+              EXTENSION_MIME[path.extname(name)] ?? 'application/octet-stream',
+            );
             res.end(data);
           },
           () => {

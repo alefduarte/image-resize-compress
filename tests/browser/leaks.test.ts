@@ -33,7 +33,9 @@ describe('no object-URL leaks (HTMLImageElement fallback path)', () => {
     const create = vi.spyOn(URL, 'createObjectURL');
     const revoke = vi.spyOn(URL, 'revokeObjectURL');
 
-    await expect(fromBlob(txt, { format: 'png' })).rejects.toBeInstanceOf(InvalidImageError);
+    await expect(fromBlob(txt, { format: 'png' })).rejects.toBeInstanceOf(
+      InvalidImageError,
+    );
 
     expect(create.mock.calls.length).toBeGreaterThan(0);
     expect(revoke.mock.calls.length).toBe(create.mock.calls.length);

@@ -50,9 +50,12 @@ export const networkError = (url: string, cause: unknown): FetchError =>
 
 /** Build a {@link FetchError} for a non-ok HTTP response. */
 export const httpError = (url: string, response: Response): FetchError =>
-  new FetchError(`Fetch failed for ${url}: ${response.status} ${response.statusText}`, {
-    status: response.status,
-  });
+  new FetchError(
+    `Fetch failed for ${url}: ${response.status} ${response.statusText}`,
+    {
+      status: response.status,
+    },
+  );
 
 /** `true` when the value is an abort-related error that must pass through untouched. */
 export const isAbortError = (err: unknown): boolean =>
@@ -60,5 +63,6 @@ export const isAbortError = (err: unknown): boolean =>
 
 /** Throw an `AbortError` if the signal is already aborted. */
 export const throwIfAborted = (signal?: AbortSignal): void => {
-  if (signal?.aborted) throw new DOMException('The operation was aborted.', 'AbortError');
+  if (signal?.aborted)
+    throw new DOMException('The operation was aborted.', 'AbortError');
 };

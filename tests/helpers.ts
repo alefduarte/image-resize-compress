@@ -8,7 +8,9 @@ export const loadFixture = async (name: string): Promise<Blob> => {
 };
 
 /** Decode a blob and return its pixel dimensions via the real `createImageBitmap`. */
-export const decodeDims = async (blob: Blob): Promise<{ width: number; height: number }> => {
+export const decodeDims = async (
+  blob: Blob,
+): Promise<{ width: number; height: number }> => {
   const bitmap = await createImageBitmap(blob);
   const dims = { width: bitmap.width, height: bitmap.height };
   bitmap.close();
@@ -24,7 +26,9 @@ export const magicBytes = async (blob: Blob, n = 12): Promise<string> => {
 /** First `n` bytes as an ASCII string (for RIFF/WEBP container checks). */
 export const asciiBytes = async (blob: Blob, n = 16): Promise<string> => {
   const buf = new Uint8Array(await blob.slice(0, n).arrayBuffer());
-  return Array.from(buf, (b) => (b >= 32 && b < 127 ? String.fromCharCode(b) : '.')).join('');
+  return Array.from(buf, (b) =>
+    b >= 32 && b < 127 ? String.fromCharCode(b) : '.',
+  ).join('');
 };
 
 /** Draw a solid synthetic image of exact dimensions and return it as a real Blob. */

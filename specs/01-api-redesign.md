@@ -88,9 +88,14 @@ The v2 positional call must keep working through v3.x:
 ```ts
 function fromBlob(blob, options?: ResizeOptions): Promise<Blob>;
 /** @deprecated Use the options-object signature. Will be removed in v4. */
-function fromBlob(blob, quality?: number, width?: number | 'auto',
-                  height?: number | 'auto', format?: LegacyFormat | null,
-                  backgroundColor?: string | null): Promise<Blob>;
+function fromBlob(
+  blob,
+  quality?: number,
+  width?: number | 'auto',
+  height?: number | 'auto',
+  format?: LegacyFormat | null,
+  backgroundColor?: string | null,
+): Promise<Blob>;
 ```
 
 - Detection: `typeof arg2 === 'number'` (or `arg3+` present) → legacy path; object or undefined → new path.
@@ -101,21 +106,21 @@ function fromBlob(blob, quality?: number, width?: number | 'auto',
 
 ### Input validation summary (fail fast, clear messages)
 
-| Input | Rule | Error |
-|-------|------|-------|
-| `blob` | `instanceof Blob`, `size > 0` | `TypeError` / `InvalidImageError` |
-| `quality` | finite, `0 < q <= 100` | `RangeError` |
-| `width`/`height` | `'auto'` or finite number `> 0` (integers after rounding) | `RangeError` |
-| `maxWidthOrHeight` | finite `> 0`; not combined with explicit width/height | `RangeError` |
-| `format` | member of `ImageFormat` | `UnsupportedFormatError` |
-| `targetSize` | finite `> 0`; format must be jpeg/webp | `RangeError` |
-| `url` | non-empty string | `TypeError` |
+| Input              | Rule                                                      | Error                             |
+| ------------------ | --------------------------------------------------------- | --------------------------------- |
+| `blob`             | `instanceof Blob`, `size > 0`                             | `TypeError` / `InvalidImageError` |
+| `quality`          | finite, `0 < q <= 100`                                    | `RangeError`                      |
+| `width`/`height`   | `'auto'` or finite number `> 0` (integers after rounding) | `RangeError`                      |
+| `maxWidthOrHeight` | finite `> 0`; not combined with explicit width/height     | `RangeError`                      |
+| `format`           | member of `ImageFormat`                                   | `UnsupportedFormatError`          |
+| `targetSize`       | finite `> 0`; format must be jpeg/webp                    | `RangeError`                      |
+| `url`              | non-empty string                                          | `TypeError`                       |
 
 ## Non-goals
 
 - Web worker execution is NOT part of this spec — the `worker` option's behavior is fully specified in spec 08; here it only reserves the field (validation: boolean or undefined).
 - No `onProgress` callback (adds surface for marginal value at our speed; revisit if requested).
-- No EXIF metadata *preservation* (orientation handling is spec 02; keeping full EXIF in output is out of scope — canvas strips it, and that is a documented privacy *feature*).
+- No EXIF metadata _preservation_ (orientation handling is spec 02; keeping full EXIF in output is out of scope — canvas strips it, and that is a documented privacy _feature_).
 
 ## Acceptance criteria
 

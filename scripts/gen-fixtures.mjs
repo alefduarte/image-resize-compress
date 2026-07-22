@@ -44,10 +44,32 @@ const jpegSofDims = (jpeg) => {
 const injectExifOrientation6 = (jpeg) => {
   // TIFF (little-endian): 1 IFD entry, tag 0x0112 Orientation = 6.
   const tiff = Buffer.from([
-    0x49, 0x49, 0x2a, 0x00, 0x08, 0x00, 0x00, 0x00, // "II", 42, IFD0 offset=8
-    0x01, 0x00, // 1 entry
-    0x12, 0x01, 0x03, 0x00, 0x01, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, // Orientation SHORT =6
-    0x00, 0x00, 0x00, 0x00, // next IFD = 0
+    0x49,
+    0x49,
+    0x2a,
+    0x00,
+    0x08,
+    0x00,
+    0x00,
+    0x00, // "II", 42, IFD0 offset=8
+    0x01,
+    0x00, // 1 entry
+    0x12,
+    0x01,
+    0x03,
+    0x00,
+    0x01,
+    0x00,
+    0x00,
+    0x00,
+    0x06,
+    0x00,
+    0x00,
+    0x00, // Orientation SHORT =6
+    0x00,
+    0x00,
+    0x00,
+    0x00, // next IFD = 0
   ]);
   const exifHeader = Buffer.from('Exif\0\0', 'latin1');
   const payloadLen = 2 + exifHeader.length + tiff.length; // length field includes itself
@@ -146,7 +168,8 @@ const exif = injectExifOrientation6(b64ToBuf(drawn.exifBase.b64));
 // Canonical 43-byte 1x1 transparent GIF89a — battle-tested bytes, decodes
 // everywhere. Only used as a decode-only "gif input → png output" fixture; the
 // suite never inspects frame count. Verified to decode below before writing.
-const ANIMATED_GIF_B64 = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+const ANIMATED_GIF_B64 =
+  'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 const animatedGif = b64ToBuf(ANIMATED_GIF_B64);
 
 const notAnImage = Buffer.from('this is definitely not an image\n', 'utf8');
@@ -160,43 +183,52 @@ const fixturesToVerify = {
   'animated.gif': animatedGif,
 };
 
-const verify = await page.evaluate(async ([entries]) => {
-  const out = {};
-  for (const [name, arr] of entries) {
-    const bytes = Uint8Array.from(arr);
-    const blob = new Blob([bytes]);
-    try {
-      const bmp = await createImageBitmap(blob);
-      out[name] = { ok: true, w: bmp.width, h: bmp.height };
-      bmp.close();
-    } catch (e) {
-      out[name] = { ok: false, err: String(e) };
+const verify = await page.evaluate(
+  async ([entries]) => {
+    const out = {};
+    for (const [name, arr] of entries) {
+      const bytes = Uint8Array.from(arr);
+      const blob = new Blob([bytes]);
+      try {
+        const bmp = await createImageBitmap(blob);
+        out[name] = { ok: true, w: bmp.width, h: bmp.height };
+        bmp.close();
+      } catch (e) {
+        out[name] = { ok: false, err: String(e) };
+      }
     }
-  }
-  // orientation check for the EXIF fixture: decoded (from-image) dims
-  const exifArr = entries.find(([n]) => n === 'exif-orientation-6.jpg')[1];
-  const exifBlob = new Blob([Uint8Array.from(exifArr)]);
-  const oriented = await createImageBitmap(exifBlob, { imageOrientation: 'from-image' });
-  out.__exif = { oriented: [oriented.width, oriented.height] };
-  oriented.close();
-  return out;
-}, [Object.entries(fixturesToVerify).map(([n, b]) => [n, Array.from(b)])]);
+    // orientation check for the EXIF fixture: decoded (from-image) dims
+    const exifArr = entries.find(([n]) => n === 'exif-orientation-6.jpg')[1];
+    const exifBlob = new Blob([Uint8Array.from(exifArr)]);
+    const oriented = await createImageBitmap(exifBlob, {
+      imageOrientation: 'from-image',
+    });
+    out.__exif = { oriented: [oriented.width, oriented.height] };
+    oriented.close();
+    return out;
+  },
+  [Object.entries(fixturesToVerify).map(([n, b]) => [n, Array.from(b)])],
+);
 
 console.log('decode verification:', JSON.stringify(verify, null, 2));
 
 // measure q30 vs q95 re-encode ratio of the decoded photo (the compression test)
-const ratio = await page.evaluate(async ([arr]) => {
-  const blob = new Blob([Uint8Array.from(arr)]);
-  const bmp = await createImageBitmap(blob);
-  const c = document.createElement('canvas');
-  c.width = bmp.width;
-  c.height = bmp.height;
-  c.getContext('2d').drawImage(bmp, 0, 0);
-  const enc = (q) => new Promise((r) => c.toBlob((b) => r(b.size), 'image/jpeg', q));
-  const q30 = await enc(0.3);
-  const q95 = await enc(0.95);
-  return { q30, q95, smaller: 1 - q30 / q95 };
-}, [Array.from(fixturesToVerify['photo-800x600.jpg'])]);
+const ratio = await page.evaluate(
+  async ([arr]) => {
+    const blob = new Blob([Uint8Array.from(arr)]);
+    const bmp = await createImageBitmap(blob);
+    const c = document.createElement('canvas');
+    c.width = bmp.width;
+    c.height = bmp.height;
+    c.getContext('2d').drawImage(bmp, 0, 0);
+    const enc = (q) =>
+      new Promise((r) => c.toBlob((b) => r(b.size), 'image/jpeg', q));
+    const q30 = await enc(0.3);
+    const q95 = await enc(0.95);
+    return { q30, q95, smaller: 1 - q30 / q95 };
+  },
+  [Array.from(fixturesToVerify['photo-800x600.jpg'])],
+);
 console.log('photo re-encode q30 vs q95:', ratio);
 
 await browser.close();
@@ -217,7 +249,9 @@ if (b64ToBuf(drawn.photo.b64).length >= 30_000) {
   throw new Error('photo fixture >= 30 kB; reduce quality/detail');
 }
 if (ratio.smaller < 0.4) {
-  throw new Error(`photo q30 not <=60% of q95 (only ${(ratio.smaller * 100) | 0}% smaller)`);
+  throw new Error(
+    `photo q30 not <=60% of q95 (only ${(ratio.smaller * 100) | 0}% smaller)`,
+  );
 }
 
 await Promise.all([
@@ -229,7 +263,11 @@ await Promise.all([
   write('not-an-image.txt', notAnImage),
 ]);
 
-const total = Object.values(fixturesToVerify).reduce((s, b) => s + b.length, 0) + notAnImage.length;
+const total =
+  Object.values(fixturesToVerify).reduce((s, b) => s + b.length, 0) +
+  notAnImage.length;
 console.log(`total fixture bytes: ${total} (< 100 kB required)`);
 if (total >= 100_000) throw new Error('total fixtures >= 100 kB');
-console.log(`exif dims: encoded ${encoded.width}x${encoded.height} -> oriented ${oriented}`);
+console.log(
+  `exif dims: encoded ${encoded.width}x${encoded.height} -> oriented ${oriented}`,
+);

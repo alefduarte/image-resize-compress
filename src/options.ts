@@ -45,7 +45,9 @@ const normalizeDimension = (
 };
 
 /** Validate and normalize a new-style options object (pure). */
-export const normalizeOptions = (options: ResizeOptions = {}): NormalizedOptions => {
+export const normalizeOptions = (
+  options: ResizeOptions = {},
+): NormalizedOptions => {
   const {
     quality,
     width,
@@ -59,7 +61,12 @@ export const normalizeOptions = (options: ResizeOptions = {}): NormalizedOptions
   } = options;
 
   if (quality !== undefined) {
-    if (typeof quality !== 'number' || !Number.isFinite(quality) || quality <= 0 || quality > 100) {
+    if (
+      typeof quality !== 'number' ||
+      !Number.isFinite(quality) ||
+      quality <= 0 ||
+      quality > 100
+    ) {
       throw new RangeError('quality must be a number in (0, 100]');
     }
   }
@@ -72,7 +79,9 @@ export const normalizeOptions = (options: ResizeOptions = {}): NormalizedOptions
       throw new RangeError('maxWidthOrHeight must be a number > 0');
     }
     if (typeof w === 'number' || typeof h === 'number') {
-      throw new RangeError('maxWidthOrHeight cannot be combined with width/height');
+      throw new RangeError(
+        'maxWidthOrHeight cannot be combined with width/height',
+      );
     }
   }
 
@@ -119,7 +128,11 @@ const warnDeprecated = (): void => {
 /** Map a legacy positional `quality` (v2 dual-scale) onto the 0–100 scale. */
 const mapLegacyQuality = (quality: number | undefined): number | undefined => {
   if (quality === undefined) return undefined;
-  if (typeof quality !== 'number' || !Number.isFinite(quality) || quality <= 0) {
+  if (
+    typeof quality !== 'number' ||
+    !Number.isFinite(quality) ||
+    quality <= 0
+  ) {
     throw new RangeError('quality must be > 0');
   }
   // v2 semantics: `q < 1` was already a 0–1 fraction; otherwise it was 0–100.
@@ -133,7 +146,9 @@ const mapLegacyDimension = (
 ): number | 'auto' | undefined => (value === 0 ? 'auto' : value);
 
 /** Map a legacy positional `format` onto {@link ImageFormat}, throwing for bmp/gif. */
-const mapLegacyFormat = (format: LegacyFormat | null | undefined): ImageFormat | undefined => {
+const mapLegacyFormat = (
+  format: LegacyFormat | null | undefined,
+): ImageFormat | undefined => {
   if (format === null || format === undefined) return undefined;
   if (format === 'bmp' || format === 'gif') {
     throw new UnsupportedFormatError(unsupportedFormatMessage(format));

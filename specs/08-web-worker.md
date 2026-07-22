@@ -31,7 +31,7 @@ Worker source is a function stringified at build time into a Blob URL — keeps 
 
 ```ts
 // worker/host.ts (main thread side)
-let workerPromise: Promise<Worker> | null = null;   // lazy singleton
+let workerPromise: Promise<Worker> | null = null; // lazy singleton
 
 function getWorker(): Promise<Worker> {
   // create Blob(['(', workerMain.toString(), ')()'], {type:'text/javascript'})
@@ -75,13 +75,13 @@ Safari ≥ 16.4, Chrome, Firefox all pass. Older → silent fallback.
 
 ### What runs where (`worker: true`, supported env)
 
-| Step | Where |
-|------|-------|
-| validation / option normalization | main thread (fail fast, sync) |
-| fetch (`fromURL`) | main thread |
-| `createImageBitmap(blob)` | worker |
-| resize + encode (+ targetSize loop) | worker |
-| error rehydration | main thread |
+| Step                                | Where                         |
+| ----------------------------------- | ----------------------------- |
+| validation / option normalization   | main thread (fail fast, sync) |
+| fetch (`fromURL`)                   | main thread                   |
+| `createImageBitmap(blob)`           | worker                        |
+| resize + encode (+ targetSize loop) | worker                        |
+| error rehydration                   | main thread                   |
 
 ## Size budget impact
 
@@ -98,17 +98,17 @@ Still ~3× smaller than browser-image-compression. Same rule: budget is a ceilin
 
 ## Tests (extends spec 03 browser tier)
 
-| Test | Assertion |
-|------|-----------|
-| Parity | Same fixture + opts with `worker: true` vs `false` → same output dims, same `blob.type`, size within ±5% |
-| Actually off-thread | With `worker: true`, `Worker` constructor spy called; message round-trip observed |
-| Fallback | Stub `OffscreenCanvas = undefined` → `worker: true` still resolves correctly (main path) |
-| CSP-style failure | Make `new Worker` throw → silent fallback, result correct, no unhandled rejection |
-| Typed errors cross boundary | `bmp` format + `worker: true` → rejects `UnsupportedFormatError` (instanceof) |
-| Abort | Abort mid-targetSize-loop with `worker: true` → `AbortError`; later completion for that id ignored |
-| Concurrency | 4 simultaneous `worker: true` calls with different opts → 4 correct, non-swapped results (id correlation) |
-| targetSize in worker | `targetSize` honored with `worker: true` |
-| Reuse | Two sequential calls → exactly one `Worker` constructed |
+| Test                        | Assertion                                                                                                 |
+| --------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Parity                      | Same fixture + opts with `worker: true` vs `false` → same output dims, same `blob.type`, size within ±5%  |
+| Actually off-thread         | With `worker: true`, `Worker` constructor spy called; message round-trip observed                         |
+| Fallback                    | Stub `OffscreenCanvas = undefined` → `worker: true` still resolves correctly (main path)                  |
+| CSP-style failure           | Make `new Worker` throw → silent fallback, result correct, no unhandled rejection                         |
+| Typed errors cross boundary | `bmp` format + `worker: true` → rejects `UnsupportedFormatError` (instanceof)                             |
+| Abort                       | Abort mid-targetSize-loop with `worker: true` → `AbortError`; later completion for that id ignored        |
+| Concurrency                 | 4 simultaneous `worker: true` calls with different opts → 4 correct, non-swapped results (id correlation) |
+| targetSize in worker        | `targetSize` honored with `worker: true`                                                                  |
+| Reuse                       | Two sequential calls → exactly one `Worker` constructed                                                   |
 
 ## Docs (extends spec 07)
 

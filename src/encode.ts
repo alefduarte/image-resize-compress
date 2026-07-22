@@ -1,4 +1,8 @@
-import { UnsupportedFormatError, InvalidImageError, throwIfAborted } from './errors';
+import {
+  UnsupportedFormatError,
+  InvalidImageError,
+  throwIfAborted,
+} from './errors';
 import { formatToMime, normalizeMime, TARGET_SIZE_PNG } from './mime';
 import type { ImageFormat } from './types';
 
@@ -20,13 +24,20 @@ export interface EncodeOptions {
 const MAX_TARGET_SIZE_ITERATIONS = 8;
 
 /** Low-level canvas → blob, transparently handling OffscreenCanvas and HTMLCanvasElement. */
-const canvasToBlob = (canvas: AnyCanvas, mime: string, quality?: number): Promise<Blob> => {
+const canvasToBlob = (
+  canvas: AnyCanvas,
+  mime: string,
+  quality?: number,
+): Promise<Blob> => {
   if ('convertToBlob' in canvas) {
     return canvas.convertToBlob({ type: mime, quality });
   }
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(
-      (blob) => (blob ? resolve(blob) : reject(new InvalidImageError('Canvas produced no blob'))),
+      (blob) =>
+        blob
+          ? resolve(blob)
+          : reject(new InvalidImageError('Canvas produced no blob')),
       mime,
       quality,
     );
@@ -38,7 +49,11 @@ const canvasToBlob = (canvas: AnyCanvas, mime: string, quality?: number): Promis
  * silently fall back to `image/png` for unsupported types; we detect the
  * mismatch and throw instead of returning a mislabeled blob.
  */
-const encodeChecked = async (canvas: AnyCanvas, mime: string, quality?: number): Promise<Blob> => {
+const encodeChecked = async (
+  canvas: AnyCanvas,
+  mime: string,
+  quality?: number,
+): Promise<Blob> => {
   const blob = await canvasToBlob(canvas, mime, quality);
   if (blob.type !== mime) {
     throw new UnsupportedFormatError(
@@ -59,13 +74,20 @@ const resolveOutputMime = (opts: EncodeOptions): string => {
  * quality (jpeg/webp only) over at most 8 encodes. Returns the encoder's blob
  * as-is — never re-wraps it.
  */
-export const encode = async (canvas: AnyCanvas, opts: EncodeOptions): Promise<Blob> => {
+export const encode = async (
+  canvas: AnyCanvas,
+  opts: EncodeOptions,
+): Promise<Blob> => {
   const mime = resolveOutputMime(opts);
   const { signal, quality, targetSize } = opts;
 
   if (targetSize === undefined) {
     throwIfAborted(signal);
-    return encodeChecked(canvas, mime, quality === undefined ? undefined : quality / 100);
+    return encodeChecked(
+      canvas,
+      mime,
+      quality === undefined ? undefined : quality / 100,
+    );
   }
 
   if (mime === 'image/png') {

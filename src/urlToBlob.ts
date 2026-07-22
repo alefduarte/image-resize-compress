@@ -7,7 +7,10 @@ import { isAbortError, httpError, networkError } from './errors';
  * @param fetchOptions Fetch options (e.g. headers, credentials, signal).
  * @returns A promise resolving to the fetched blob.
  */
-const urlToBlob = async (url: string, fetchOptions?: RequestInit): Promise<Blob> => {
+const urlToBlob = async (
+  url: string,
+  fetchOptions?: RequestInit,
+): Promise<Blob> => {
   if (typeof url !== 'string' || url.length === 0) {
     throw new TypeError('url must be a non-empty string');
   }

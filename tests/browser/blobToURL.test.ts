@@ -19,10 +19,14 @@ describe('blobToURL', () => {
   });
 
   it('rejects a non-Blob argument with TypeError', async () => {
-    await expect(blobToURL(42 as unknown as Blob)).rejects.toBeInstanceOf(TypeError);
+    await expect(blobToURL(42 as unknown as Blob)).rejects.toBeInstanceOf(
+      TypeError,
+    );
   });
 
   it('rejects an empty blob with InvalidImageError', async () => {
-    await expect(blobToURL(new Blob([]))).rejects.toBeInstanceOf(InvalidImageError);
+    await expect(blobToURL(new Blob([]))).rejects.toBeInstanceOf(
+      InvalidImageError,
+    );
   });
 });

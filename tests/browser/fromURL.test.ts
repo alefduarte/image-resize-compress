@@ -78,8 +78,12 @@ describe('urlToBlob', () => {
   });
 
   it('wraps a network rejection in FetchError', async () => {
-    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new TypeError('Failed to fetch'));
-    await expect(urlToBlob('https://cross.example/x.png')).rejects.toBeInstanceOf(FetchError);
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(
+      new TypeError('Failed to fetch'),
+    );
+    await expect(
+      urlToBlob('https://cross.example/x.png'),
+    ).rejects.toBeInstanceOf(FetchError);
   });
 
   it('rejects an empty url with TypeError', async () => {

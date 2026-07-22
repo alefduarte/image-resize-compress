@@ -1,4 +1,9 @@
-import { EnvironmentError, ImageTooLargeError, InvalidImageError, throwIfAborted } from './errors';
+import {
+  EnvironmentError,
+  ImageTooLargeError,
+  InvalidImageError,
+  throwIfAborted,
+} from './errors';
 import { MAX_PIXELS, resolveSize } from './geometry';
 import { encode, type AnyCanvas } from './encode';
 import type { DecodedImage } from './decode';
@@ -20,7 +25,9 @@ export const makeCanvas = (width: number, height: number): AnyCanvas => {
     canvas.height = height;
     return canvas;
   }
-  throw new EnvironmentError('image-resize-compress requires a browser environment');
+  throw new EnvironmentError(
+    'image-resize-compress requires a browser environment',
+  );
 };
 
 /** Options accepted by {@link processBitmap} — resize options plus the source mime type. */
@@ -30,7 +37,9 @@ export interface PipelineOptions extends NormalizedOptions {
 
 const assertPixelLimit = (width: number, height: number): void => {
   if (width * height > MAX_PIXELS) {
-    throw new ImageTooLargeError(`Image too large (${width}×${height}); exceeds ${MAX_PIXELS}px`);
+    throw new ImageTooLargeError(
+      `Image too large (${width}×${height}); exceeds ${MAX_PIXELS}px`,
+    );
   }
 };
 

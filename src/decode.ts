@@ -1,6 +1,12 @@
-import { EnvironmentError, InvalidImageError, isAbortError, throwIfAborted } from './errors';
+import {
+  EnvironmentError,
+  InvalidImageError,
+  isAbortError,
+  throwIfAborted,
+} from './errors';
 
-const DECODE_FAILED = 'Failed to decode image; it may be corrupt or an unsupported format';
+const DECODE_FAILED =
+  'Failed to decode image; it may be corrupt or an unsupported format';
 
 /** A decoded image ready to be drawn onto a canvas, plus its natural size. */
 export interface DecodedImage {
@@ -16,14 +22,21 @@ export interface DecodedImage {
  * `document is not defined` when used outside a browser.
  */
 export const assertBrowserEnv = (): void => {
-  if (typeof document === 'undefined' && typeof createImageBitmap === 'undefined') {
-    throw new EnvironmentError('image-resize-compress requires a browser environment');
+  if (
+    typeof document === 'undefined' &&
+    typeof createImageBitmap === 'undefined'
+  ) {
+    throw new EnvironmentError(
+      'image-resize-compress requires a browser environment',
+    );
   }
 };
 
 const decodeViaBitmap = async (blob: Blob): Promise<DecodedImage> => {
   // `imageOrientation: 'from-image'` applies EXIF orientation for free.
-  const bitmap = await createImageBitmap(blob, { imageOrientation: 'from-image' });
+  const bitmap = await createImageBitmap(blob, {
+    imageOrientation: 'from-image',
+  });
   return {
     source: bitmap,
     width: bitmap.width,
@@ -56,7 +69,10 @@ const decodeViaImage = async (blob: Blob): Promise<DecodedImage> => {
  * off-main-thread decode, native EXIF orientation) and falls back to an object
  * URL + `HTMLImageElement`. Object URLs are always revoked.
  */
-export const decode = async (blob: Blob, signal?: AbortSignal): Promise<DecodedImage> => {
+export const decode = async (
+  blob: Blob,
+  signal?: AbortSignal,
+): Promise<DecodedImage> => {
   throwIfAborted(signal);
 
   if (typeof createImageBitmap === 'function') {

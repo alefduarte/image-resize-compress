@@ -24,7 +24,7 @@ describe('format conversion (bytes verified, not just the label)', () => {
     const png = await loadFixture('tiny-1x1.png');
     const out = await fromBlob(png, { format: 'jpeg' });
     expect(out.type).toBe('image/jpeg');
-    expect((await magicBytes(out, 3))).toBe('ffd8ff');
+    expect(await magicBytes(out, 3)).toBe('ffd8ff');
   });
 
   it('gif input with no format falls back to png output', async () => {
@@ -43,8 +43,8 @@ describe('format conversion (bytes verified, not just the label)', () => {
 
   it("format:'bmp' throws UnsupportedFormatError", async () => {
     const photo = await loadFixture('photo-800x600.jpg');
-    await expect(fromBlob(photo, { format: 'bmp' as unknown as 'png' })).rejects.toBeInstanceOf(
-      UnsupportedFormatError,
-    );
+    await expect(
+      fromBlob(photo, { format: 'bmp' as unknown as 'png' }),
+    ).rejects.toBeInstanceOf(UnsupportedFormatError);
   });
 });

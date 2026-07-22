@@ -12,13 +12,15 @@ afterEach(() => {
 describe('input errors', () => {
   it('rejects a non-image text blob with InvalidImageError', async () => {
     const txt = await loadFixture('not-an-image.txt');
-    await expect(fromBlob(txt, { format: 'png' })).rejects.toBeInstanceOf(InvalidImageError);
+    await expect(fromBlob(txt, { format: 'png' })).rejects.toBeInstanceOf(
+      InvalidImageError,
+    );
   });
 
   it('rejects an empty blob with InvalidImageError', async () => {
-    await expect(fromBlob(new Blob([], { type: 'image/png' }))).rejects.toBeInstanceOf(
-      InvalidImageError,
-    );
+    await expect(
+      fromBlob(new Blob([], { type: 'image/png' })),
+    ).rejects.toBeInstanceOf(InvalidImageError);
   });
 
   it('rejects a non-Blob argument with TypeError', async () => {
@@ -47,11 +49,15 @@ describe('ImageTooLargeError (decompression-bomb guard)', () => {
     ).rejects.toBeInstanceOf(ImageTooLargeError);
 
     expect(offscreenSpy).not.toHaveBeenCalled();
-    expect(createElSpy.mock.calls.filter((c) => c[0] === 'canvas')).toHaveLength(0);
+    expect(
+      createElSpy.mock.calls.filter((c) => c[0] === 'canvas'),
+    ).toHaveLength(0);
   });
 
   it('throws when the requested target dimensions exceed the pixel limit', async () => {
     const photo = await loadFixture('photo-800x600.jpg');
-    await expect(fromBlob(photo, { width: 20_000 })).rejects.toBeInstanceOf(ImageTooLargeError);
+    await expect(fromBlob(photo, { width: 20_000 })).rejects.toBeInstanceOf(
+      ImageTooLargeError,
+    );
   });
 });

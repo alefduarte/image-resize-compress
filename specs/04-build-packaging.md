@@ -21,15 +21,15 @@
   "jsdelivr": "./dist/index.global.js",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",     // tsup emits index.d.cts alongside for cjs
+      "types": "./dist/index.d.ts", // tsup emits index.d.cts alongside for cjs
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "require": "./dist/index.cjs",
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
   },
   "files": ["dist"],
-  "engines": { "node": ">=18" },        // tooling floor; browser lib, document that
-  "packageManager": "pnpm@<pin current>"
+  "engines": { "node": ">=18" }, // tooling floor; browser lib, document that
+  "packageManager": "pnpm@<pin current>",
 }
 ```
 
@@ -43,7 +43,7 @@
 export default defineConfig({
   entry: ['src/index.ts'],
   format: ['esm', 'cjs', 'iife'],
-  globalName: 'imageResizeCompress',   // matches README examples
+  globalName: 'imageResizeCompress', // matches README examples
   dts: true,
   sourcemap: true,
   clean: true,

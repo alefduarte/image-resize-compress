@@ -34,14 +34,18 @@ describe('resolveSize', () => {
 
   it('rounds fractional derived dimensions to integers', () => {
     // 100x33 → width 50 → height 33 * 50/100 = 16.5 → 17
-    expect(resolveSize({ width: 100, height: 33 }, { width: 50, height: 'auto' })).toEqual({
+    expect(
+      resolveSize({ width: 100, height: 33 }, { width: 50, height: 'auto' }),
+    ).toEqual({
       width: 50,
       height: 17,
     });
   });
 
   it('floors dimensions at 1x1 (never zero)', () => {
-    expect(resolveSize({ width: 10, height: 10 }, { width: 0.2, height: 'auto' })).toEqual({
+    expect(
+      resolveSize({ width: 10, height: 10 }, { width: 0.2, height: 'auto' }),
+    ).toEqual({
       width: 1,
       height: 1,
     });
@@ -49,28 +53,48 @@ describe('resolveSize', () => {
 
   describe('maxWidthOrHeight', () => {
     it('scales down by the longest edge (width dominant)', () => {
-      expect(resolveSize({ width: 400, height: 200 }, { width: 'auto', height: 'auto', maxWidthOrHeight: 100 })).toEqual({
+      expect(
+        resolveSize(
+          { width: 400, height: 200 },
+          { width: 'auto', height: 'auto', maxWidthOrHeight: 100 },
+        ),
+      ).toEqual({
         width: 100,
         height: 50,
       });
     });
 
     it('scales down by the longest edge (height dominant, 200x400 → 50x100)', () => {
-      expect(resolveSize({ width: 200, height: 400 }, { width: 'auto', height: 'auto', maxWidthOrHeight: 100 })).toEqual({
+      expect(
+        resolveSize(
+          { width: 200, height: 400 },
+          { width: 'auto', height: 'auto', maxWidthOrHeight: 100 },
+        ),
+      ).toEqual({
         width: 50,
         height: 100,
       });
     });
 
     it('is a no-op when the image already fits (never upscales)', () => {
-      expect(resolveSize({ width: 80, height: 40 }, { width: 'auto', height: 'auto', maxWidthOrHeight: 100 })).toEqual({
+      expect(
+        resolveSize(
+          { width: 80, height: 40 },
+          { width: 'auto', height: 'auto', maxWidthOrHeight: 100 },
+        ),
+      ).toEqual({
         width: 80,
         height: 40,
       });
     });
 
     it('is a no-op at exactly the cap', () => {
-      expect(resolveSize({ width: 100, height: 60 }, { width: 'auto', height: 'auto', maxWidthOrHeight: 100 })).toEqual({
+      expect(
+        resolveSize(
+          { width: 100, height: 60 },
+          { width: 'auto', height: 'auto', maxWidthOrHeight: 100 },
+        ),
+      ).toEqual({
         width: 100,
         height: 60,
       });

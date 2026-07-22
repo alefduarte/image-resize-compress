@@ -24,7 +24,9 @@ const blobToURL = (blob: Blob | File): Promise<string> => {
       }
     };
     reader.onerror = () =>
-      reject(new InvalidImageError('Failed to read blob', { cause: reader.error }));
+      reject(
+        new InvalidImageError('Failed to read blob', { cause: reader.error }),
+      );
     reader.readAsDataURL(blob);
   });
 };

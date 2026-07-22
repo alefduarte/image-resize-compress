@@ -12,17 +12,21 @@ import { assertBrowserEnv } from './decode';
 describe('browser environment guard (Node tier)', () => {
   it('assertBrowserEnv throws EnvironmentError with the documented message', () => {
     expect(() => assertBrowserEnv()).toThrow(EnvironmentError);
-    expect(() => assertBrowserEnv()).toThrow('image-resize-compress requires a browser environment');
-  });
-
-  it('fromBlob rejects with EnvironmentError when called in Node', async () => {
-    await expect(fromBlob(new Blob(['x'], { type: 'image/png' }))).rejects.toBeInstanceOf(
-      EnvironmentError,
+    expect(() => assertBrowserEnv()).toThrow(
+      'image-resize-compress requires a browser environment',
     );
   });
 
+  it('fromBlob rejects with EnvironmentError when called in Node', async () => {
+    await expect(
+      fromBlob(new Blob(['x'], { type: 'image/png' })),
+    ).rejects.toBeInstanceOf(EnvironmentError);
+  });
+
   it('fromURL rejects with EnvironmentError when called in Node', async () => {
-    await expect(fromURL('https://example.com/a.png')).rejects.toBeInstanceOf(EnvironmentError);
+    await expect(fromURL('https://example.com/a.png')).rejects.toBeInstanceOf(
+      EnvironmentError,
+    );
   });
 
   it('makeCanvas throws EnvironmentError when no canvas backend exists', () => {

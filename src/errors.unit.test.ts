@@ -76,7 +76,9 @@ describe('error builders', () => {
 describe('abort helpers', () => {
   it('isAbortError detects a DOMException AbortError only', () => {
     expect(isAbortError(new DOMException('aborted', 'AbortError'))).toBe(true);
-    expect(isAbortError(new DOMException('other', 'NotFoundError'))).toBe(false);
+    expect(isAbortError(new DOMException('other', 'NotFoundError'))).toBe(
+      false,
+    );
     expect(isAbortError(new Error('AbortError'))).toBe(false);
     expect(isAbortError('AbortError')).toBe(false);
   });

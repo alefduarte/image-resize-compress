@@ -17,7 +17,10 @@ describe('backgroundColor flattening (transparent png → jpeg)', () => {
 
   it("flattens transparent pixels onto backgroundColor '#ff0000' (red)", async () => {
     const src = await loadFixture('transparent-64x64.png');
-    const out = await fromBlob(src, { format: 'jpeg', backgroundColor: '#ff0000' });
+    const out = await fromBlob(src, {
+      format: 'jpeg',
+      backgroundColor: '#ff0000',
+    });
     const [r, g, b] = await probePixel(out, 50, 50);
     expect(r).toBeGreaterThan(200);
     expect(g).toBeLessThan(60);
@@ -26,7 +29,10 @@ describe('backgroundColor flattening (transparent png → jpeg)', () => {
 
   it("accepts the shorthand backgroundColor '#f00'", async () => {
     const src = await loadFixture('transparent-64x64.png');
-    const out = await fromBlob(src, { format: 'jpeg', backgroundColor: '#f00' });
+    const out = await fromBlob(src, {
+      format: 'jpeg',
+      backgroundColor: '#f00',
+    });
     const [r, g, b] = await probePixel(out, 50, 50);
     expect(r).toBeGreaterThan(200);
     expect(g).toBeLessThan(60);

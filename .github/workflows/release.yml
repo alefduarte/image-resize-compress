@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  push:
+    branches: [master]
+
+# Never cancel an in-progress release: interrupting a publish is dangerous.
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify
+    # Forks must never attempt to release.
+    if: github.repository == 'alefduarte/image-resize-compress'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test:unit
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Browser tests
+        run: pnpm test:browser
+
+      - name: Build
+        run: pnpm build
+
+      - name: Size limit
+        run: pnpm size
+
+      - name: Publint
+        run: pnpm publint
+
+      - name: Are the types wrong?
+        run: pnpm attw
+
+  release:
+    name: Release
+    needs: verify
+    if: github.repository == 'alefduarte/image-resize-compress'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write # create tags, commit changelog, publish GitHub Release
+      issues: write # comment on released issues
+      pull-requests: write # comment on released PRs
+      id-token: write # OIDC token for npm provenance / trusted publishing
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # semantic-release needs full history and tags to compute the version.
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      # Node 22 ships npm 10.9.x; trusted publishing (OIDC) needs npm >= 11.5.
+      - name: Upgrade npm for trusted publishing + provenance
+        run: npm install -g npm@latest
+
+      - name: Release
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'

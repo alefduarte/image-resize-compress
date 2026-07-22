@@ -33,23 +33,23 @@ Fixtures are loaded via `fetch('/fixtures/...')` served by Vitest browser mode (
 
 ## What the browser tier must prove
 
-| Test | Assertion |
-|------|-----------|
-| Resize exact | `fromBlob(photo, { width: 200 })` → decode result, dims are 200×150 |
-| Aspect auto | height-only, maxWidthOrHeight variants → exact expected integer dims |
-| Compression works | `quality: 30` jpeg output is ≥ 40% smaller than `quality: 95` output of same fixture |
-| Format conversion real | `format: 'webp'` → magic bytes `RIFF....WEBP`, `blob.type === 'image/webp'` (bytes checked, not just the label) |
-| gif input → png out | animated.gif with no format → png magic bytes |
-| targetSize | photo with `targetSize: 20_000` → `size <= 20_000`, and result still decodable |
-| targetSize unreachable | absurdly small target → resolves with smallest attempt (no infinite loop, < 9 encodes via spy) |
-| EXIF orientation | orientation-6 fixture → output width/height swapped vs raw naturalWidth (upright) |
-| backgroundColor | transparent png → jpeg with `backgroundColor: '#ff0000'` → probe pixel is red |
-| Abort | pre-aborted signal rejects `AbortError`; no blob produced |
-| Errors | not-an-image.txt → `InvalidImageError`; empty blob → `InvalidImageError`; `bmp` format → `UnsupportedFormatError` |
-| fromURL | served fixture URL end-to-end; 404 → `FetchError{status:404}`; HTML response → `InvalidImageError` |
-| Legacy overload | `fromBlob(photo, 80, 100, 'auto', 'webp')` still works + warns once (spy on console.warn) |
-| blobToURL/urlToBlob | round-trip: blob → dataURL → still starts `data:image/`; urlToBlob returns image blob |
-| No leaks | spy `URL.createObjectURL`/`revokeObjectURL` — every create has a matching revoke, including on error paths |
+| Test                   | Assertion                                                                                                         |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Resize exact           | `fromBlob(photo, { width: 200 })` → decode result, dims are 200×150                                               |
+| Aspect auto            | height-only, maxWidthOrHeight variants → exact expected integer dims                                              |
+| Compression works      | `quality: 30` jpeg output is ≥ 40% smaller than `quality: 95` output of same fixture                              |
+| Format conversion real | `format: 'webp'` → magic bytes `RIFF....WEBP`, `blob.type === 'image/webp'` (bytes checked, not just the label)   |
+| gif input → png out    | animated.gif with no format → png magic bytes                                                                     |
+| targetSize             | photo with `targetSize: 20_000` → `size <= 20_000`, and result still decodable                                    |
+| targetSize unreachable | absurdly small target → resolves with smallest attempt (no infinite loop, < 9 encodes via spy)                    |
+| EXIF orientation       | orientation-6 fixture → output width/height swapped vs raw naturalWidth (upright)                                 |
+| backgroundColor        | transparent png → jpeg with `backgroundColor: '#ff0000'` → probe pixel is red                                     |
+| Abort                  | pre-aborted signal rejects `AbortError`; no blob produced                                                         |
+| Errors                 | not-an-image.txt → `InvalidImageError`; empty blob → `InvalidImageError`; `bmp` format → `UnsupportedFormatError` |
+| fromURL                | served fixture URL end-to-end; 404 → `FetchError{status:404}`; HTML response → `InvalidImageError`                |
+| Legacy overload        | `fromBlob(photo, 80, 100, 'auto', 'webp')` still works + warns once (spy on console.warn)                         |
+| blobToURL/urlToBlob    | round-trip: blob → dataURL → still starts `data:image/`; urlToBlob returns image blob                             |
+| No leaks               | spy `URL.createObjectURL`/`revokeObjectURL` — every create has a matching revoke, including on error paths        |
 
 `decodeDims(blob)` helper: `createImageBitmap(blob)` → `{width, height}`. `magicBytes(blob)`: first 12 bytes hex.
 

@@ -66,11 +66,13 @@ Call `bitmap.close()` after drawing. This alone fixes the EXIF-rotated-phone-pho
 
 ```ts
 // errors.ts — all extend Error, all carry .name for non-instanceof checks
-export class ImageProcessError extends Error {}          // base
-export class InvalidImageError extends ImageProcessError {}   // empty/corrupt/undecodable
+export class ImageProcessError extends Error {} // base
+export class InvalidImageError extends ImageProcessError {} // empty/corrupt/undecodable
 export class UnsupportedFormatError extends ImageProcessError {}
 export class ImageTooLargeError extends ImageProcessError {}
-export class FetchError extends ImageProcessError { status?: number }
+export class FetchError extends ImageProcessError {
+  status?: number;
+}
 export class EnvironmentError extends ImageProcessError {}
 ```
 
