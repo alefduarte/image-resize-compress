@@ -1,0 +1,69 @@
+name: Bug report
+description: Something is not working as documented.
+title: 'bug: '
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! `image-resize-compress` runs only in the browser —
+        if you saw `EnvironmentError`, you are calling it during SSR/Node; call
+        it client-side instead.
+  - type: input
+    id: version
+    attributes:
+      label: Library version
+      description: Output of `npm ls image-resize-compress` (or the CDN version).
+      placeholder: 3.0.0
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: Chrome 126, Safari 17.4, Firefox 127
+    validations:
+      required: true
+  - type: input
+    id: input-format
+    attributes:
+      label: Input format and size
+      description: The source image's type and approximate size.
+      placeholder: image/jpeg, ~4 MB, 4032x3024
+    validations:
+      required: true
+  - type: textarea
+    id: snippet
+    attributes:
+      label: Code snippet
+      description: The minimal call that reproduces the problem. This is auto-formatted as JS.
+      render: js
+      placeholder: |
+        const out = await fromBlob(file, { quality: 80, format: 'webp' });
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual
+      description: What you expected to happen, and what actually happened (include any error name/message).
+    validations:
+      required: true
+  - type: dropdown
+    id: repro
+    attributes:
+      label: Can you share a runnable repro?
+      description: A StackBlitz/CodeSandbox link gets bugs fixed far faster.
+      options:
+        - 'Yes — link below'
+        - 'No, but the snippet above is complete'
+        - 'No'
+    validations:
+      required: true
+  - type: input
+    id: repro-link
+    attributes:
+      label: Reproduction link
+      placeholder: https://stackblitz.com/edit/...
+    validations:
+      required: false

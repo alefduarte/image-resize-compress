@@ -1,0 +1,45 @@
+name: Feature request
+description: Suggest a new capability or API.
+title: 'feat: '
+labels: ['enhancement']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This library optimizes for small size and zero dependencies. Features
+        that add meaningful bundle weight face a high bar — please help us weigh
+        the trade-off.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do that is hard or impossible today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-api
+    attributes:
+      label: Proposed API
+      description: How would you like it to look? A `ResizeOptions` field, a new function, etc.
+      render: ts
+      placeholder: |
+        fromBlob(file, { /* new option here */ });
+    validations:
+      required: true
+  - type: dropdown
+    id: bundle-cost
+    attributes:
+      label: Would this add bundle size?
+      description: The ESM budget is 3 kB and the IIFE budget is 3.5 kB (min+brotli).
+      options:
+        - 'No — pure logic on existing code paths'
+        - "Maybe — I'm not sure"
+        - 'Yes — it needs new code or data'
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
