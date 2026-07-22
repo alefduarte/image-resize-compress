@@ -1,0 +1,112 @@
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import type { Plugin } from 'vite';
+import { playwright } from '@vitest/browser-playwright';
+import { defineConfig } from 'vitest/config';
+
+const fixturesDir = fileURLToPath(new URL('./tests/fixtures', import.meta.url));
+
+const EXTENSION_MIME: Record<string, string> = {
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.webp': 'image/webp',
+  '.txt': 'text/plain; charset=utf-8',
+};
+
+/**
+ * Serves test fixtures and synthetic HTTP responses to the browser tier so
+ * `fromURL`/`urlToBlob` can be exercised end-to-end against the Vitest server:
+ *   GET /fixtures/<name>   → the committed fixture file with a real image mime
+ *   GET /__test__/404      → 404 (FetchError status test)
+ *   GET /__test__/html     → 200 text/html (non-image InvalidImageError test)
+ */
+const fixtureServer = (): Plugin => ({
+  name: 'serve-test-fixtures',
+  configureServer(server) {
+    server.middlewares.use((req, res, next) => {
+      const url = (req.url ?? '').split('?')[0];
+
+      if (url.startsWith('/__test__/404')) {
+        res.statusCode = 404;
+        res.statusMessage = 'Not Found';
+        res.end('Not Found');
+        return;
+      }
+
+      if (url.startsWith('/__test__/html')) {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.end('<!doctype html><title>error page</title><h1>Not an image</h1>');
+        return;
+      }
+
+      if (url.startsWith('/fixtures/')) {
+        const name = decodeURIComponent(url.slice('/fixtures/'.length));
+        const filePath = path.join(fixturesDir, name);
+        // Reject path traversal outside the fixtures directory.
+        if (!path.resolve(filePath).startsWith(path.resolve(fixturesDir))) {
+          res.statusCode = 403;
+          res.end('Forbidden');
+          return;
+        }
+        readFile(filePath).then(
+          (data) => {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', EXTENSION_MIME[path.extname(name)] ?? 'application/octet-stream');
+            res.end(data);
+          },
+          () => {
+            res.statusCode = 404;
+            res.end('Not Found');
+          },
+        );
+        return;
+      }
+
+      next();
+    });
+  },
+});
+
+export default defineConfig({
+  plugins: [fixtureServer()],
+  test: {
+    projects: [
+      {
+        test: {
+          name: 'unit',
+          environment: 'node',
+          include: ['src/**/*.unit.test.ts'],
+        },
+      },
+      {
+        plugins: [fixtureServer()],
+        test: {
+          name: 'browser',
+          include: ['tests/browser/**/*.test.ts'],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'chromium' }],
+          },
+        },
+      },
+    ],
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.ts'],
+      exclude: ['src/**/*.unit.test.ts', 'src/types.ts'],
+      reporter: ['text', 'json', 'html'],
+      thresholds: {
+        lines: 90,
+        branches: 90,
+        functions: 90,
+        statements: 90,
+      },
+    },
+  },
+});

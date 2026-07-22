@@ -4,3 +4,8 @@
 /coverage/
 
 /dist
+
+# Vitest browser-mode artifacts
+/.vitest-attachments/
+**/__screenshots__/
+*.timestamp-*.mjs
