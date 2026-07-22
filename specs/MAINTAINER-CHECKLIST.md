@@ -102,7 +102,7 @@ If npm org/account settings block trusted publishing:
       **Read and write**, short expiry.
 - [x] GitHub repo → **Settings** → **Secrets and variables** → **Actions** →
       **New repository secret**, name **`NPM_TOKEN`**.
-- [ ] Add `NPM_TOKEN: ${{ secrets.NPM_TOKEN }}` to the `env:` of the **Release**
+- [x] Add `NPM_TOKEN: ${{ secrets.NPM_TOKEN }}` to the `env:` of the **Release**
       step in `.github/workflows/release.yml`.
 
 Prefer trusted publishing; delete the token (section 3) once OIDC works.
@@ -111,15 +111,15 @@ Prefer trusted publishing; delete the token (section 3) once OIDC works.
 
 ## 3. npm account hardening (after Trusted Publishing works)
 
-- [ ] Enable npm account 2FA for **authorization and writes**:
+- [x] Enable npm account 2FA for **authorization and writes**:
       npmjs.com → **Account** → **Two-Factor Authentication** → prefer
       **FIDO2 / passkey** over TOTP.
-- [ ] Package setting **"Require two-factor authentication and disallow
+- [x] Package setting **"Require two-factor authentication and disallow
       tokens"**: package **Settings** → **Publishing access** →
       **Require two-factor authentication and disallow tokens** → Save.
       Publishing is then possible **only** through the trusted workflow, and
       settings changes require maintainer 2FA.
-- [ ] **Delete all legacy/classic npm tokens:** npmjs.com → **Access Tokens** →
+- [x] **Delete all legacy/classic npm tokens:** npmjs.com → **Access Tokens** →
       revoke every classic/automation token (and the fallback granular token
       from 2a if trusted publishing succeeded).
 
@@ -134,8 +134,8 @@ Repo → **Settings** → **General** → **Pull Requests**:
 - [x] Enable **Allow squash merging**.
 - [x] Under squash merging, set **default commit message** to **"Pull request
       title"** (so the enforced PR title lands verbatim as the squash commit).
-- [ ] **Disable Allow merge commits.**
-- [ ] **Disable Allow rebase merging.**
+- [x] **Disable Allow merge commits.**
+- [x] **Disable Allow rebase merging.**
 
 > **Why squash-only:** semantic-release computes versions and the changelog
 > from the commits that land on `master`. The pipeline's guarantee is that the
