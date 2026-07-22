@@ -1,8 +1,9 @@
 import type { LegacyFormat, ResizeOptions } from './types';
-import { InvalidImageError } from './errors';
+import { InvalidImageError, throwIfAborted } from './errors';
 import { resolveFromBlobArgs, type NormalizedOptions } from './options';
 import { assertBrowserEnv, decode } from './decode';
 import { processBitmap } from './pipeline';
+import { runInWorker } from './worker-host';
 
 /**
  * Internal entry point shared with {@link fromURL}: takes an already-normalized
@@ -17,6 +18,17 @@ export const processBlob = async (
   }
   if (blob.size === 0) {
     throw new InvalidImageError('Image is empty (0 bytes)');
+  }
+
+  // A pre-aborted signal must reject before any worker involvement.
+  throwIfAborted(opts.signal);
+
+  // Opt-in worker path (spec 08). Returns null when the worker is unavailable,
+  // so we transparently fall back to the main-thread pipeline below — a genuine
+  // processing error rejects instead of falling back.
+  if (opts.worker) {
+    const viaWorker = runInWorker(blob, opts);
+    if (viaWorker) return viaWorker;
   }
 
   const decoded = await decode(blob, opts.signal);

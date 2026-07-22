@@ -9,12 +9,10 @@
  * always passes through untouched.
  */
 
-export class ImageProcessError extends Error {
-  constructor(message: string, options?: ErrorOptions) {
-    super(message, options);
-    Object.setPrototypeOf(this, new.target.prototype);
-  }
-}
+// Native `class extends Error` (build target es2020) keeps the prototype chain
+// intact, so `instanceof` works without the `Object.setPrototypeOf` hack and
+// the inherited `Error(message, options)` constructor already forwards `cause`.
+export class ImageProcessError extends Error {}
 ImageProcessError.prototype.name = 'ImageProcessError';
 
 /** Empty, corrupt, or otherwise undecodable image input. */
@@ -50,12 +48,40 @@ export const networkError = (url: string, cause: unknown): FetchError =>
 
 /** Build a {@link FetchError} for a non-ok HTTP response. */
 export const httpError = (url: string, response: Response): FetchError =>
-  new FetchError(
-    `Fetch failed for ${url}: ${response.status} ${response.statusText}`,
-    {
-      status: response.status,
-    },
-  );
+  new FetchError(`Fetch failed for ${url}: ${response.status}`, {
+    status: response.status,
+  });
+
+// Keyed by each class's `.prototype.name` at lookup time — avoids repeating the
+// name strings (which already live on the prototypes) as object keys.
+const ERROR_CLASSES: Array<new (message: string) => ImageProcessError> = [
+  InvalidImageError,
+  UnsupportedFormatError,
+  ImageTooLargeError,
+  EnvironmentError,
+  FetchError,
+];
+
+/**
+ * Rehydrate an error that crossed a boundary as a plain `{ name, message }`
+ * (the self-contained `core.ts` pipeline, or the worker's structured-clone
+ * response) back into its real class so `instanceof` works identically on the
+ * main-thread and worker paths. `cause` does NOT survive the boundary — it is
+ * intentionally dropped.
+ */
+export const rehydrate = (err: unknown): Error => {
+  const e = (err ?? {}) as { name?: string; message?: string };
+  const name = e.name ?? '';
+  const message = e.message ?? '';
+  if (name === 'AbortError') return abortError();
+  if (name === 'RangeError') return new RangeError(message);
+  const C = ERROR_CLASSES.find((K) => K.prototype.name === name);
+  return new (C ?? ImageProcessError)(message);
+};
+
+/** The canonical `AbortError` (a `DOMException`), shared across all abort paths. */
+export const abortError = (): DOMException =>
+  new DOMException('Aborted', 'AbortError');
 
 /** `true` when the value is an abort-related error that must pass through untouched. */
 export const isAbortError = (err: unknown): boolean =>
@@ -63,6 +89,5 @@ export const isAbortError = (err: unknown): boolean =>
 
 /** Throw an `AbortError` if the signal is already aborted. */
 export const throwIfAborted = (signal?: AbortSignal): void => {
-  if (signal?.aborted)
-    throw new DOMException('The operation was aborted.', 'AbortError');
+  if (signal?.aborted) throw abortError();
 };

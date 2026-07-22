@@ -28,6 +28,17 @@ export const normalizeMime = (mime: string | undefined): string | undefined => {
   return ENCODABLE_MIMES.has(canonical) ? canonical : undefined;
 };
 
+/**
+ * Resolve the output mime type from the requested format, else the input type,
+ * else png. Called on the main thread / worker host (never inside the
+ * self-contained `core.ts` pipeline) so these maps live in the bundle once.
+ */
+export const resolveOutputMime = (
+  format: ImageFormat | undefined,
+  inputType: string | undefined,
+): string =>
+  format ? formatToMime(format) : (normalizeMime(inputType) ?? 'image/png');
+
 /** `true` if the mime type looks like an image (`image/*`). */
 export const isImageMime = (mime: string | undefined): boolean =>
   typeof mime === 'string' && mime.toLowerCase().startsWith('image/');

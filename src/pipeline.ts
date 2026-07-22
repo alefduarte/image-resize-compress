@@ -1,19 +1,20 @@
-import {
-  EnvironmentError,
-  ImageTooLargeError,
-  InvalidImageError,
-  throwIfAborted,
-} from './errors';
-import { MAX_PIXELS, resolveSize } from './geometry';
-import { encode, type AnyCanvas } from './encode';
+import { EnvironmentError, rehydrate } from './errors';
+import { runPipeline } from './core';
+import { resolveOutputMime } from './mime';
 import type { DecodedImage } from './decode';
 import type { NormalizedOptions } from './options';
 
+/** Either canvas surface the pipeline may produce. */
+export type AnyCanvas = HTMLCanvasElement | OffscreenCanvas;
+
 /**
  * The canvas creation abstraction. Uses `OffscreenCanvas` when available
- * (also the worker path in spec 08), otherwise an `HTMLCanvasElement`. This is
- * the ONLY place a canvas is created — no direct `document.createElement('canvas')`
- * calls exist elsewhere.
+ * (also the worker path in spec 08), otherwise an `HTMLCanvasElement`.
+ *
+ * The production resize path lives in the self-contained {@link runPipeline}
+ * (which inlines this same logic so it stays embeddable in the worker); this
+ * export is retained as the documented single abstraction and is exercised by
+ * the Node-tier environment guard test.
  */
 export const makeCanvas = (width: number, height: number): AnyCanvas => {
   if (typeof OffscreenCanvas === 'function') {
@@ -35,55 +36,25 @@ export interface PipelineOptions extends NormalizedOptions {
   inputType?: string;
 }
 
-const assertPixelLimit = (width: number, height: number): void => {
-  if (width * height > MAX_PIXELS) {
-    throw new ImageTooLargeError(
-      `Image too large (${width}×${height}); exceeds ${MAX_PIXELS}px`,
-    );
-  }
-};
-
 /**
- * Resize + encode a decoded image. Enforces the pixel-count safety limit before
- * any canvas is allocated, applies optional background flattening, and uses
- * high-quality smoothing. Structured so spec 08's worker can call it directly.
+ * Resize + encode a decoded image on the main thread. Delegates to the shared
+ * self-contained {@link runPipeline} and rehydrates its name-tagged errors into
+ * the typed `errors.ts` classes.
  */
 export const processBitmap = async (
   decoded: DecodedImage,
   opts: PipelineOptions,
 ): Promise<Blob> => {
   const { signal } = opts;
-  throwIfAborted(signal);
-
-  const natural = { width: decoded.width, height: decoded.height };
-  assertPixelLimit(natural.width, natural.height);
-
-  const target = resolveSize(natural, opts);
-  assertPixelLimit(target.width, target.height);
-
-  const canvas = makeCanvas(target.width, target.height);
-  // Cast to HTMLCanvasElement for typing; OffscreenCanvas's 2D context shares
-  // every member used below (fillStyle, fillRect, drawImage, smoothing).
-  const ctx = (canvas as HTMLCanvasElement).getContext('2d');
-  if (!ctx) {
-    throw new InvalidImageError('No 2D canvas context');
+  try {
+    return await runPipeline(
+      decoded.source,
+      decoded.width,
+      decoded.height,
+      { ...opts, mime: resolveOutputMime(opts.format, opts.inputType) },
+      signal ? () => signal.aborted : undefined,
+    );
+  } catch (err) {
+    throw rehydrate(err);
   }
-
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'high';
-
-  if (opts.backgroundColor) {
-    ctx.fillStyle = opts.backgroundColor;
-    ctx.fillRect(0, 0, target.width, target.height);
-  }
-
-  ctx.drawImage(decoded.source, 0, 0, target.width, target.height);
-
-  return encode(canvas, {
-    format: opts.format,
-    inputType: opts.inputType,
-    quality: opts.quality,
-    targetSize: opts.targetSize,
-    signal,
-  });
 };

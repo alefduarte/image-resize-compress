@@ -97,6 +97,10 @@ export default defineConfig({
             headless: true,
             provider: playwright(),
             instances: [{ browser: 'chromium' }],
+            // Pin to an allowed IPv4 port: Vite only retries auto-port on
+            // EADDRINUSE, not EACCES, so a random port landing in a Windows
+            // reserved range (Hyper-V/WSL) hard-fails. Inert on CI/Linux.
+            api: { port: 51890, host: '127.0.0.1' },
           },
         },
       },
@@ -104,7 +108,9 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],
-      exclude: ['src/**/*.unit.test.ts', 'src/types.ts'],
+      // worker-entry.ts only ever runs inside a Worker, on a stringified copy
+      // the page-context instrumenter never sees — it is uninstrumentable here.
+      exclude: ['src/**/*.unit.test.ts', 'src/types.ts', 'src/worker-entry.ts'],
       reporter: ['text', 'json', 'html'],
       thresholds: {
         lines: 90,

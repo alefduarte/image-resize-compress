@@ -17,11 +17,8 @@ const blobToURL = (blob: Blob | File): Promise<string> => {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
-      if (typeof reader.result === 'string') {
-        resolve(reader.result);
-      } else {
-        reject(new InvalidImageError('Failed to convert blob to data URL'));
-      }
+      if (typeof reader.result === 'string') resolve(reader.result);
+      else reject(new InvalidImageError('Failed to read blob'));
     };
     reader.onerror = () =>
       reject(

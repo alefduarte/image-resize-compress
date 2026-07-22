@@ -121,7 +121,7 @@ const warnDeprecated = (): void => {
   if (deprecationWarned) return;
   deprecationWarned = true;
   console.warn(
-    '[image-resize-compress] Positional arguments are deprecated; pass an options object. https://github.com/alefduarte/image-resize-compress#migrating-to-v3',
+    'image-resize-compress: Positional arguments are deprecated; pass an options object.',
   );
 };
 

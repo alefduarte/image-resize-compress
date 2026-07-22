@@ -5,8 +5,7 @@ import {
   throwIfAborted,
 } from './errors';
 
-const DECODE_FAILED =
-  'Failed to decode image; it may be corrupt or an unsupported format';
+const DECODE_FAILED = 'Failed to decode image';
 
 /** A decoded image ready to be drawn onto a canvas, plus its natural size. */
 export interface DecodedImage {
