@@ -119,7 +119,7 @@ triggers a release derived from the squash-commit message.
 ## Maintainer tasks
 
 Owner-only, one-time setup that cannot live in the repo (npm trusted publishing,
-branch protection, enabling Discussions, etc.) is documented in
-[`specs/MAINTAINER-CHECKLIST.md`](specs/MAINTAINER-CHECKLIST.md).
+branch protection, enabling Discussions, etc.) is tracked by the maintainer
+outside the repository.
 
 By contributing you agree to abide by the [Code of Conduct](CODE_OF_CONDUCT.md).

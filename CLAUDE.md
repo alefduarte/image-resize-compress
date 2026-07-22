@@ -18,8 +18,8 @@ every change; they are non-negotiable.
   passes. Add tests for behavior changes.
 - **Conventional Commits.** Merges are squash-only, so the PR title is the
   commit that ships. `feat:`/`fix:` drive releases; `feat!:` is a major bump.
-- **Never hand-bump versions or edit `CHANGELOG.md`.** semantic-release owns
-  both.
+- **Never hand-bump the `version` field.** semantic-release stamps the real
+  version into the published tarball; the in-repo value stays stale by design.
+  The changelog lives in GitHub Releases, not the repo.
 
-See `CONTRIBUTING.md` for setup and the module map, and
-`specs/MAINTAINER-CHECKLIST.md` for owner-only tasks.
+See `CONTRIBUTING.md` for setup and the module map.
