@@ -1,29 +1,34 @@
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+import { assertBrowserEnv } from './decode';
+import { InvalidImageError } from './errors';
+
 /**
- * Convert File or Blob to DataURL
+ * Convert a File or Blob to a data URL.
  *
- * @param {Blob | File} blob Blob or File to convert.
- * @returns {Promise<string | ArrayBuffer>} Promise resolving to a DataURL string.
+ * @param blob The blob or file to convert.
+ * @returns A promise resolving to a data URL string.
  */
-const blobToURL = (blob: Blob | File): Promise<string | ArrayBuffer> => {
-  return new Promise((resolve, reject) => {
-    if (blob.size === 0) {
-      return reject(new Error('Cannot convert empty Blob.'));
-    }
-    if (blob.size > MAX_FILE_SIZE) {
-      return reject(new Error('File size exceeds the maximum allowed limit.'));
-    }
+const blobToURL = async (blob: Blob | File): Promise<string> => {
+  // FileReader is browser-only; fail fast with EnvironmentError in SSR/Node
+  // instead of a cryptic ReferenceError. `async` turns each throw into a
+  // rejection, so no per-check Promise.reject wrapper is needed.
+  assertBrowserEnv();
+  if (!(blob instanceof Blob)) {
+    throw new TypeError('Expected a Blob or File');
+  }
+  if (blob.size === 0) {
+    throw new InvalidImageError('Image is empty (0 bytes)');
+  }
+
+  return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
-
     reader.onloadend = () => {
-      if (reader.result) {
-        resolve(reader.result);
-      } else {
-        reject(new Error('Failed to convert blob to DataURL.'));
-      }
+      if (typeof reader.result === 'string') resolve(reader.result);
+      else reject(new InvalidImageError('Failed to read blob'));
     };
-
-    reader.onerror = () => reject(new Error('Error reading blob.'));
+    reader.onerror = () =>
+      reject(
+        new InvalidImageError('Failed to read blob', { cause: reader.error }),
+      );
     reader.readAsDataURL(blob);
   });
 };

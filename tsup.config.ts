@@ -3,11 +3,12 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   entry: ['src/index.ts'],
   outDir: 'dist',
-  format: ['esm', 'cjs'],
+  format: ['esm', 'cjs', 'iife'],
+  globalName: 'imageResizeCompress',
   dts: true,
-  sourcemap: false,
+  sourcemap: true,
   clean: true,
-  target: 'esnext',
   minify: true,
-  splitting: true,
+  splitting: false,
+  target: 'es2020',
 });

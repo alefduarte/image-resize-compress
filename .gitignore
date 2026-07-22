@@ -4,3 +4,10 @@
 /coverage/
 
 /dist
+
+# Vitest browser-mode artifacts
+/.vitest-attachments/
+**/__screenshots__/
+*.timestamp-*.mjs
+# Internal implementation specs — not part of the published package
+/specs/
