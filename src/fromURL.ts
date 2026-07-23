@@ -13,10 +13,7 @@ import { fetchImage } from './urlToBlob';
  * @param options Resize options plus `fetchOptions`. See {@link FromURLOptions}.
  * @returns A promise resolving to the processed image blob.
  */
-async function fromURL(
-  url: string,
-  options?: FromURLOptions,
-): Promise<Blob> {
+async function fromURL(url: string, options?: FromURLOptions): Promise<Blob> {
   assertBrowserEnv();
 
   const { fetchOptions, ...rest } = options ?? {};
