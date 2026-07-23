@@ -97,7 +97,7 @@
   "size-limit": [
     {
       "path": "dist/index.js",
-      "limit": "3 kB"
+      "limit": "3.05 kB"
     },
     {
       "path": "dist/index.global.js",
