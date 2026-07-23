@@ -187,6 +187,7 @@
         justify-content: space-between;
       }
       .imgwrap {
+        position: relative;
         background: repeating-conic-gradient(
             var(--border) 0 25%,
             transparent 0 50%
@@ -205,14 +206,42 @@
         max-height: 320px;
         display: block;
       }
-      .stats {
+      /* processing overlay on the result preview */
+      .spinner {
+        position: absolute;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: color-mix(in srgb, var(--panel) 55%, transparent);
+      }
+      .spinner.on {
+        display: flex;
+      }
+      .spinner::after {
+        content: '';
+        width: 34px;
+        height: 34px;
+        border: 3px solid var(--border);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      /* per-image stats, sit under each preview */
+      .figstats {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.5rem 1.25rem;
-        margin-top: 1rem;
+        gap: 0.35rem 1rem;
+        margin-top: 0.6rem;
         font-size: 0.85rem;
+        min-height: 1.3em;
       }
-      .stats b {
+      .figstats b {
         font-variant-numeric: tabular-nums;
       }
       .saved {
@@ -343,20 +372,24 @@
                 <span>Original</span><span id="origInfo"></span>
               </figcaption>
               <div class="imgwrap"><img id="origImg" alt="" /></div>
+              <div class="figstats" id="origStats" hidden>
+                <span>Original: <b id="sizeOrig">–</b></span>
+              </div>
             </figure>
             <figure>
               <figcaption>
                 <span>Result</span><span id="outInfo"></span>
               </figcaption>
-              <div class="imgwrap"><img id="outImg" alt="" /></div>
+              <div class="imgwrap">
+                <img id="outImg" alt="" />
+                <div class="spinner" id="spinner" aria-hidden="true"></div>
+              </div>
+              <div class="figstats" id="outStats" hidden>
+                <span>Result: <b id="sizeOut">–</b></span>
+                <span id="savedWrap">Saved: <b class="saved" id="saved">–</b></span>
+                <span>Took: <b id="took">–</b></span>
+              </div>
             </figure>
-          </div>
-
-          <div class="stats" id="stats" hidden>
-            <span>Original: <b id="sizeOrig">–</b></span>
-            <span>Result: <b id="sizeOut">–</b></span>
-            <span id="savedWrap">Saved: <b class="saved" id="saved">–</b></span>
-            <span>Took: <b id="took">–</b></span>
           </div>
 
           <div class="actions">
@@ -398,12 +431,15 @@
       let debounce;
       let runId = 0; // guards against out-of-order async process() runs
 
+      const showSpinner = () => el('spinner').classList.add('on');
+      const hideSpinner = () => el('spinner').classList.remove('on');
+
       const clearResult = () => {
         if (resultUrl) URL.revokeObjectURL(resultUrl);
         resultUrl = resultBlob = null;
         el('outImg').removeAttribute('src');
         el('outInfo').textContent = '';
-        el('stats').hidden = true;
+        el('outStats').hidden = true;
         el('download').disabled = true;
       };
 
@@ -447,7 +483,9 @@
             orig.naturalWidth + '×' + orig.naturalHeight;
         };
         el('sizeOrig').textContent = fmtBytes(file.size);
+        el('origStats').hidden = false;
         el('reset').disabled = false;
+        showSpinner();
         process();
       }
 
@@ -463,6 +501,8 @@
         'worker',
       ].forEach((id) =>
         el(id).addEventListener('input', () => {
+          if (!currentFile) return;
+          showSpinner(); // instant feedback before the debounced run
           clearTimeout(debounce);
           debounce = setTimeout(process, 250);
         }),
@@ -488,7 +528,7 @@
         const t0 = performance.now();
         try {
           const blob = await imageResizeCompress.fromBlob(currentFile, opts);
-          if (my !== runId) return; // a newer run superseded this one
+          if (my !== runId) return; // superseded; the newer run owns the spinner
           const took = Math.round(performance.now() - t0);
           if (resultUrl) URL.revokeObjectURL(resultUrl);
           resultBlob = blob;
@@ -504,13 +544,15 @@
             (pct >= 0 ? '−' : '+') + Math.abs(pct).toFixed(1) + '%';
           el('savedWrap').style.display = pct >= 0 ? '' : 'none';
           el('took').textContent = took + ' ms';
-          el('stats').hidden = false;
+          el('outStats').hidden = false;
           el('download').disabled = false;
+          hideSpinner();
         } catch (err) {
           if (my !== runId) return;
           clearResult(); // don't leave a stale, downloadable result on error
           el('err').hidden = false;
           el('err').textContent = err.name + ': ' + err.message;
+          hideSpinner();
         }
       }
 
@@ -532,8 +574,10 @@
         if (origUrl) URL.revokeObjectURL(origUrl);
         origUrl = null;
         clearResult();
+        hideSpinner();
         el('origImg').removeAttribute('src');
         el('origInfo').textContent = '';
+        el('origStats').hidden = true;
         el('reset').disabled = true;
         el('err').hidden = true;
         el('file').value = '';
