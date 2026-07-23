@@ -434,8 +434,18 @@
       let debounce;
       let runId = 0; // guards against out-of-order async process() runs
 
-      const showSpinner = (id = 'spinner') => el(id).classList.add('on');
-      const hideSpinner = (id = 'spinner') => el(id).classList.remove('on');
+      // Toggle the spinner and mark its preview aria-busy so assistive tech
+      // announces the processing state (the spinner itself is decorative).
+      const showSpinner = (id = 'spinner') => {
+        const sp = el(id);
+        sp.classList.add('on');
+        sp.parentElement.setAttribute('aria-busy', 'true');
+      };
+      const hideSpinner = (id = 'spinner') => {
+        const sp = el(id);
+        sp.classList.remove('on');
+        sp.parentElement.setAttribute('aria-busy', 'false');
+      };
 
       const clearResult = () => {
         if (resultUrl) URL.revokeObjectURL(resultUrl);
