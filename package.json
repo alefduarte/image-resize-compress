@@ -37,6 +37,7 @@
     "test:browser": "vitest run --project browser",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
+    "demo": "pnpm dlx serve demo",
     "size": "size-limit",
     "publint": "publint --pack npm",
     "attw": "attw --pack",
