@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import fromBlob from '../../src/fromBlob';
 import { decodeDims, loadFixture } from '../helpers';
 
-/** Count encode iterations via the OffscreenCanvas surface makeCanvas produces in Chromium. */
+/** Count encode iterations via the OffscreenCanvas surface the pipeline produces in Chromium. */
 const spyEncodes = () => vi.spyOn(OffscreenCanvas.prototype, 'convertToBlob');
 
 afterEach(() => {

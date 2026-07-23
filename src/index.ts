@@ -7,7 +7,6 @@ export { fromBlob, fromURL, blobToURL, urlToBlob };
 
 export type {
   ImageFormat,
-  LegacyFormat,
   ResizeOptions,
   FromURLOptions,
   Size,

@@ -261,14 +261,21 @@ throws `EnvironmentError` (instead of a cryptic `document is not defined`). Call
 it client-side - inside an effect, an event handler, or a `'use client'`
 component.
 
+## Migrating to v4
+
+**Breaking: the deprecated positional signature is removed.** `fromBlob` and
+`fromURL` now accept only `(input, options?)`. Callers still on the v2/v3
+positional form must switch to the options object — the mapping is identical to
+the v3 table below. Extra positional arguments are now silently ignored rather
+than mapped, so migrate any remaining positional calls.
+
 ## Migrating to v3
 
-v3 replaces the positional arguments with an options object. The **old
-positional signature still works** but logs a one-time deprecation warning
-(`image-resize-compress: Positional arguments are deprecated; pass an options object.`)
-and will be removed in v4.
+v3 replaced the positional arguments with an options object. (In v3 the old
+positional signature still worked with a deprecation warning; **it is gone as of
+v4** — see above.)
 
-| v2 (positional)                                     | v3 (options object)                                                       |
+| v2 (positional)                                     | v3+ (options object)                                                      |
 | --------------------------------------------------- | ------------------------------------------------------------------------- |
 | `fromBlob(file, 80, 'auto', 'auto', 'webp')`        | `fromBlob(file, { quality: 80, format: 'webp' })`                         |
 | `fromBlob(file, 80, 200, 'auto', 'jpeg')`           | `fromBlob(file, { quality: 80, width: 200, format: 'jpeg' })`             |
@@ -279,9 +286,7 @@ and will be removed in v4.
 treated as a 0–1 fraction (`0.8` meant 80%). In v3's options API there is no
 dual scale - `quality` is passed straight through as `quality / 100`, so **`0.8`
 now means 0.8%, not 80%**. A v2 caller who wrote `0.8` for 80% must write `80`.
-(Values ≥ 1 are unchanged: `50` = 50%, `1` = 1%.) The deprecated **positional**
-path preserves the old dual-scale semantics, so the change only bites when you
-switch to the options object - do the conversion at the same time.
+(Values ≥ 1 are unchanged: `50` = 50%, `1` = 1%.)
 
 **Breaking: `bmp` and `gif` output removed.** No major browser can _encode_
 these via `canvas.toBlob`; v2 silently produced PNG bytes mislabeled with the
