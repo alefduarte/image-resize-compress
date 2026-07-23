@@ -5,17 +5,14 @@ import type { ImageFormat } from './types';
  * `document`, `window`, `fetch`, or any DOM type at runtime.
  */
 
-const FORMAT_TO_MIME: Record<ImageFormat, string> = {
-  png: 'image/png',
-  jpeg: 'image/jpeg',
-  webp: 'image/webp',
-};
-
-const ENCODABLE_MIMES = new Set<string>(Object.values(FORMAT_TO_MIME));
+const ENCODABLE_MIMES = new Set<string>([
+  'image/png',
+  'image/jpeg',
+  'image/webp',
+]);
 
 /** Map an {@link ImageFormat} to its canonical mime type. */
-export const formatToMime = (format: ImageFormat): string =>
-  FORMAT_TO_MIME[format];
+export const formatToMime = (format: ImageFormat): string => `image/${format}`;
 
 /**
  * Normalize a mime type to a canonical encodable form, or `undefined` if it is

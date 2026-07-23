@@ -21,6 +21,7 @@ export interface NormalizedOptions {
   width: number | 'auto';
   height: number | 'auto';
   maxWidthOrHeight?: number;
+  fit?: 'stretch' | 'cover';
   format?: ImageFormat;
   backgroundColor?: string;
   targetSize?: number;
@@ -53,6 +54,7 @@ export const normalizeOptions = (
     width,
     height,
     maxWidthOrHeight,
+    fit,
     format,
     backgroundColor,
     targetSize,
@@ -107,6 +109,7 @@ export const normalizeOptions = (
     width: w,
     height: h,
     maxWidthOrHeight,
+    fit,
     format,
     backgroundColor: backgroundColor ?? undefined,
     targetSize,

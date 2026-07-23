@@ -34,6 +34,14 @@ export interface SerializableOptions {
   backgroundColor?: string;
   targetSize?: number;
   /**
+   * How the source maps onto an explicit width×height target. `'stretch'`
+   * (default) distorts to fill; `'cover'` scales to fill then center-crops the
+   * overflow, preserving aspect ratio. Only bites when both `width` and
+   * `height` are set and their ratio differs from the source's — otherwise the
+   * target already matches the source aspect and cover is a no-op.
+   */
+  fit?: 'stretch' | 'cover';
+  /**
    * Resolved output mime type. Derived on the main thread (`pipeline.ts`) or the
    * host (`worker-host.ts`) via `mime.ts` — kept OUT of this self-contained
    * function so the (already-bundled) mime maps aren't duplicated here.
@@ -123,7 +131,15 @@ export async function runPipeline(
     ctx.fillStyle = o.backgroundColor;
     ctx.fillRect(0, 0, tw, th);
   }
-  ctx.drawImage(source, 0, 0, tw, th);
+  if (o.fit === 'cover') {
+    // Scale to fill the target, then center-crop the overflowing axis.
+    const s = Math.max(tw / nw, th / nh);
+    const sw = tw / s;
+    const sh = th / s;
+    ctx.drawImage(source, (nw - sw) / 2, (nh - sh) / 2, sw, sh, 0, 0, tw, th);
+  } else {
+    ctx.drawImage(source, 0, 0, tw, th);
+  }
 
   const mime = o.mime ?? 'image/png';
   const q = o.quality;

@@ -5,14 +5,10 @@
 [![CI](https://github.com/alefduarte/image-resize-compress/actions/workflows/ci.yml/badge.svg)](https://github.com/alefduarte/image-resize-compress/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/npm/l/image-resize-compress)](./LICENSE)
 
-Resize, compress, and convert images in the browser — from a `File`, `Blob`, or
-URL — in **~3 kB** with **zero runtime dependencies**.
+Resize, compress, and convert images in the browser - from a `File`, `Blob`, or
+URL - in **~3 kB** with **zero runtime dependencies**.
 
-Releases are published from CI with [npm provenance](https://docs.npmjs.com/generating-provenance-statements)
-(the green **Provenance** badge on [npmjs.com](https://www.npmjs.com/package/image-resize-compress)),
-so you get cryptographic proof each tarball was built from this repository.
-
-> ✨ [Live demo](https://alefduarte.github.io/image-resize-compress/) — drag in an
+> ✨ [Live demo](https://alefduarte.github.io/image-resize-compress/) - drag in an
 > image and try resizing, compression, format conversion, `targetSize`, and the
 > worker option. Everything runs locally; nothing is uploaded. Source in
 > [`demo/`](demo/index.html).
@@ -91,7 +87,7 @@ const out = await fromBlob(bigFile, {
 ```
 
 - **Opt-in and silent-fallback.** If the environment lacks `OffscreenCanvas`, or
-  a strict CSP blocks blob workers, it transparently runs on the main thread —
+  a strict CSP blocks blob workers, it transparently runs on the main thread -
   same result, same errors. `worker: true` never rejects where `worker: false`
   would succeed.
 - **CSP:** a strict Content-Security-Policy needs `worker-src blob:` (or
@@ -100,7 +96,7 @@ const out = await fromBlob(bigFile, {
   for thumbnails.
 - **Abort behavior:** aborting rejects the caller immediately with `AbortError`.
   An already in-flight worker job (e.g. a long `targetSize` search) still
-  finishes internally before the next queued worker call starts — its late
+  finishes internally before the next queued worker call starts - its late
   result is simply discarded.
 
 ## API
@@ -109,17 +105,18 @@ const out = await fromBlob(bigFile, {
 
 Resize, compress, and/or convert a `Blob` or `File`.
 
-| Option             | Type                        | Default            | Notes                                                               |
-| ------------------ | --------------------------- | ------------------ | ------------------------------------------------------------------- |
-| `quality`          | `number` (0–100]            | encoder default    | jpeg/webp only. Omit to avoid recompressing harder than needed.     |
-| `width`            | `number \| 'auto'`          | `'auto'`           | Derived from `height`/original when `'auto'`.                       |
-| `height`           | `number \| 'auto'`          | `'auto'`           | Derived from `width`/original when `'auto'`.                        |
-| `maxWidthOrHeight` | `number`                    | —                  | Caps the longest edge, preserves aspect. Excludes `width`/`height`. |
-| `format`           | `'png' \| 'jpeg' \| 'webp'` | input format → png | Output format.                                                      |
-| `backgroundColor`  | `string` (CSS color)        | transparent        | Flattens transparency onto this color.                              |
-| `targetSize`       | `number` (bytes)            | —                  | jpeg/webp only; binary-searches quality.                            |
-| `signal`           | `AbortSignal`               | —                  | Rejects with `AbortError`.                                          |
-| `worker`           | `boolean`                   | `false`            | Off-main-thread, silent fallback (see above).                       |
+| Option             | Type                        | Default            | Notes                                                                        |
+| ------------------ | --------------------------- | ------------------ | ---------------------------------------------------------------------------- |
+| `quality`          | `number` (0–100]            | encoder default    | jpeg/webp only. Omit to avoid recompressing harder than needed.              |
+| `width`            | `number \| 'auto'`          | `'auto'`           | Derived from `height`/original when `'auto'`.                                |
+| `height`           | `number \| 'auto'`          | `'auto'`           | Derived from `width`/original when `'auto'`.                                 |
+| `maxWidthOrHeight` | `number`                    | -                  | Caps the longest edge, preserves aspect. Excludes `width`/`height`.          |
+| `fit`              | `'stretch' \| 'cover'`      | `'stretch'`        | `'cover'` scales to fill then center-crops. Needs explicit `width`+`height`. |
+| `format`           | `'png' \| 'jpeg' \| 'webp'` | input format → png | Output format.                                                               |
+| `backgroundColor`  | `string` (CSS color)        | transparent        | Flattens transparency onto this color.                                       |
+| `targetSize`       | `number` (bytes)            | -                  | jpeg/webp only; binary-searches quality.                                     |
+| `signal`           | `AbortSignal`               | -                  | Rejects with `AbortError`.                                                   |
+| `worker`           | `boolean`                   | `false`            | Off-main-thread, silent fallback (see above).                                |
 
 **Throws:** `TypeError` (not a `Blob`), `InvalidImageError` (empty/undecodable),
 `RangeError` (bad `quality`/dimensions/`targetSize`, or `targetSize` with `png`),
@@ -141,7 +138,7 @@ const blob = await fromURL('https://example.com/photo.jpg', {
 ```
 
 **Throws:** everything `fromBlob` throws, plus `FetchError` (network/CORS or a
-non-2xx response — carries `.status` for HTTP errors) and `InvalidImageError`
+non-2xx response - carries `.status` for HTTP errors) and `InvalidImageError`
 when the URL returns a non-image response.
 
 ### `blobToURL(blob) → Promise<string>`
@@ -188,7 +185,7 @@ try {
   } else if (err instanceof ImageProcessError) {
     console.error('processing failed', err.name);
   } else if (err.name === 'AbortError') {
-    // cancelled — ignore
+    // cancelled - ignore
   }
 }
 ```
@@ -214,6 +211,19 @@ async function onChange(e) {
 const under1MB = await fromBlob(file, {
   format: 'jpeg',
   targetSize: 1024 * 1024,
+});
+```
+
+### Square avatar (crop, not stretch)
+
+```js
+// Scale to fill a 256x256 square, then center-crop the overflow -
+// no distortion, unlike the default 'stretch'.
+const avatar = await fromBlob(file, {
+  width: 256,
+  height: 256,
+  fit: 'cover',
+  format: 'webp',
 });
 ```
 
@@ -248,7 +258,7 @@ if (isHeic) {
 
 This library runs **only in the browser**. Called during server rendering it
 throws `EnvironmentError` (instead of a cryptic `document is not defined`). Call
-it client-side — inside an effect, an event handler, or a `'use client'`
+it client-side - inside an effect, an event handler, or a `'use client'`
 component.
 
 ## Migrating to v3
@@ -267,11 +277,11 @@ and will be removed in v4.
 
 **Breaking: `quality` is now always 0–100.** In v2, values below `1` were
 treated as a 0–1 fraction (`0.8` meant 80%). In v3's options API there is no
-dual scale — `quality` is passed straight through as `quality / 100`, so **`0.8`
+dual scale - `quality` is passed straight through as `quality / 100`, so **`0.8`
 now means 0.8%, not 80%**. A v2 caller who wrote `0.8` for 80% must write `80`.
 (Values ≥ 1 are unchanged: `50` = 50%, `1` = 1%.) The deprecated **positional**
 path preserves the old dual-scale semantics, so the change only bites when you
-switch to the options object — do the conversion at the same time.
+switch to the options object - do the conversion at the same time.
 
 **Breaking: `bmp` and `gif` output removed.** No major browser can _encode_
 these via `canvas.toBlob`; v2 silently produced PNG bytes mislabeled with the
@@ -310,13 +320,13 @@ Browser-only; no IE. Works on all evergreen browsers.
 
 | Capability         | Requirement                                                                           |
 | ------------------ | ------------------------------------------------------------------------------------- |
-| Core decode/encode | `createImageBitmap` — or falls back to `HTMLImageElement` decode                      |
-| `worker: true`     | `OffscreenCanvas` (Chrome, Firefox, Safari ≥ 16.4) — else silent main-thread fallback |
+| Core decode/encode | `createImageBitmap` - or falls back to `HTMLImageElement` decode                      |
+| `worker: true`     | `OffscreenCanvas` (Chrome, Firefox, Safari ≥ 16.4) - else silent main-thread fallback |
 | Everything         | Must run in a browser; server-side use throws `EnvironmentError`                      |
 
 ## License
 
 [MIT](./LICENSE) © Alef Duarte
 
-Contributions welcome — see [CONTRIBUTING.md](./CONTRIBUTING.md) and the
+Contributions welcome - see [CONTRIBUTING.md](./CONTRIBUTING.md) and the
 [Code of Conduct](./CODE_OF_CONDUCT.md).
