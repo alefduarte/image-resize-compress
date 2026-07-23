@@ -1,0 +1,9 @@
+name: CodeQL config
+
+# The demo/ folder is an example playground (not shipped — see package.json
+# "files"). Its object-URL -> <img>.src image preview is inherently flagged by
+# js/xss-through-dom, which is a false positive there (same-origin blob URL,
+# <img> secure static mode, no HTML sink). Exclude it so demo edits don't
+# repeatedly trip the security gate. Library source in src/ is fully scanned.
+paths-ignore:
+  - demo

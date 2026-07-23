@@ -371,7 +371,10 @@
               <figcaption>
                 <span>Original</span><span id="origInfo"></span>
               </figcaption>
-              <div class="imgwrap"><img id="origImg" alt="" /></div>
+              <div class="imgwrap">
+                <img id="origImg" alt="" />
+                <div class="spinner" id="origSpinner" aria-hidden="true"></div>
+              </div>
               <div class="figstats" id="origStats" hidden>
                 <span>Original: <b id="sizeOrig">–</b></span>
               </div>
@@ -431,8 +434,8 @@
       let debounce;
       let runId = 0; // guards against out-of-order async process() runs
 
-      const showSpinner = () => el('spinner').classList.add('on');
-      const hideSpinner = () => el('spinner').classList.remove('on');
+      const showSpinner = (id = 'spinner') => el(id).classList.add('on');
+      const hideSpinner = (id = 'spinner') => el(id).classList.remove('on');
 
       const clearResult = () => {
         if (resultUrl) URL.revokeObjectURL(resultUrl);
@@ -477,11 +480,16 @@
         if (origUrl) URL.revokeObjectURL(origUrl); // don't leak the previous one
         origUrl = URL.createObjectURL(file);
         const orig = el('origImg');
-        orig.src = origUrl;
+        // A large file takes 1-2s to decode for display; show a spinner on the
+        // original preview until it paints, not just on the result.
+        showSpinner('origSpinner');
         orig.onload = () => {
           el('origInfo').textContent =
             orig.naturalWidth + '×' + orig.naturalHeight;
+          hideSpinner('origSpinner');
         };
+        orig.onerror = () => hideSpinner('origSpinner');
+        orig.src = origUrl;
         el('sizeOrig').textContent = fmtBytes(file.size);
         el('origStats').hidden = false;
         el('reset').disabled = false;
@@ -575,6 +583,7 @@
         origUrl = null;
         clearResult();
         hideSpinner();
+        hideSpinner('origSpinner');
         el('origImg').removeAttribute('src');
         el('origInfo').textContent = '';
         el('origStats').hidden = true;
