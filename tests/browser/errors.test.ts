@@ -33,7 +33,7 @@ describe('input errors', () => {
 describe('ImageTooLargeError (decompression-bomb guard)', () => {
   it('throws for an oversized source WITHOUT allocating a canvas', async () => {
     // A real 20000x20000 image is impractical; feed processBitmap a decoded stub
-    // that reports oversized natural dims. The guard runs before makeCanvas.
+    // that reports oversized natural dims. The guard runs before any canvas.
     const source = new Image(); // valid CanvasImageSource, never drawn
     const decoded: DecodedImage = {
       source,

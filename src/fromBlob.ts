@@ -1,6 +1,6 @@
-import type { LegacyFormat, ResizeOptions } from './types';
+import type { ResizeOptions } from './types';
 import { InvalidImageError, throwIfAborted } from './errors';
-import { resolveFromBlobArgs, type NormalizedOptions } from './options';
+import { normalizeOptions, type NormalizedOptions } from './options';
 import { assertBrowserEnv, decode } from './decode';
 import { processBitmap } from './pipeline';
 import { runInWorker } from './worker-host';
@@ -46,30 +46,13 @@ export const processBlob = async (
  * @param options Resize/compress/convert options. See {@link ResizeOptions}.
  * @returns A promise resolving to the processed image blob.
  */
-function fromBlob(blob: Blob | File, options?: ResizeOptions): Promise<Blob>;
-/**
- * @deprecated Use the options-object signature `fromBlob(blob, options)`.
- * The positional signature will be removed in v4.
- */
-function fromBlob(
-  blob: Blob | File,
-  quality?: number,
-  width?: number | 'auto',
-  height?: number | 'auto',
-  format?: LegacyFormat | null,
-  backgroundColor?: string | null,
-): Promise<Blob>;
 async function fromBlob(
   blob: Blob | File,
-  arg2?: ResizeOptions | number,
-  arg3?: number | 'auto',
-  arg4?: number | 'auto',
-  arg5?: LegacyFormat | null,
-  arg6?: string | null,
+  options?: ResizeOptions,
 ): Promise<Blob> {
   assertBrowserEnv();
-  const opts = resolveFromBlobArgs(arg2, arg3, arg4, arg5, arg6);
-  return processBlob(blob, opts);
+  // `?? {}` keeps a runtime `null` (or omitted arg) tolerant — mirrors fromURL.
+  return processBlob(blob, normalizeOptions(options ?? {}));
 }
 
 export default fromBlob;

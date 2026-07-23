@@ -5,13 +5,7 @@ import urlToBlob from './urlToBlob';
 
 export { fromBlob, fromURL, blobToURL, urlToBlob };
 
-export type {
-  ImageFormat,
-  LegacyFormat,
-  ResizeOptions,
-  FromURLOptions,
-  Size,
-} from './types';
+export type { ImageFormat, ResizeOptions, FromURLOptions, Size } from './types';
 
 export {
   ImageProcessError,

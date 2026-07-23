@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import fromBlob from './fromBlob';
 import fromURL from './fromURL';
 import { EnvironmentError } from './errors';
-import { makeCanvas } from './pipeline';
 import { assertBrowserEnv } from './decode';
 
 /**
@@ -27,9 +26,5 @@ describe('browser environment guard (Node tier)', () => {
     await expect(fromURL('https://example.com/a.png')).rejects.toBeInstanceOf(
       EnvironmentError,
     );
-  });
-
-  it('makeCanvas throws EnvironmentError when no canvas backend exists', () => {
-    expect(() => makeCanvas(10, 10)).toThrow(EnvironmentError);
   });
 });

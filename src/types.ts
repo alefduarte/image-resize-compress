@@ -5,12 +5,6 @@
  */
 export type ImageFormat = 'png' | 'jpeg' | 'webp';
 
-/**
- * Formats accepted by the deprecated positional (legacy) API. `bmp`/`gif` are
- * accepted for signature compatibility but now throw `UnsupportedFormatError`.
- */
-export type LegacyFormat = ImageFormat | 'bmp' | 'gif';
-
 export interface ResizeOptions {
   /** 0–100. Only applies to jpeg/webp. Omit to use the encoder default. */
   quality?: number;

@@ -5,7 +5,7 @@ every change; they are non-negotiable.
 
 - **Zero runtime dependencies.** Never add a `dependencies` entry. Everything
   ships as `devDependencies` only.
-- **Size budget.** ESM ≤ 3.05 kB, IIFE ≤ 3.5 kB (min+brotli), enforced by
+- **Size budget.** ESM ≤ 2.8 kB, IIFE ≤ 3.1 kB (min+brotli), enforced by
   `pnpm size`. The budget is a ceiling — shrink code, never raise the limit.
 - **Browser-only.** No Node canvas support. Outside a browser, fail fast with
   `EnvironmentError`. Do not add SSR/Node execution paths.

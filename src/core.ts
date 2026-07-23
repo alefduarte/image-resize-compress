@@ -56,7 +56,7 @@ export async function runPipeline(
   o: SerializableOptions,
   isAborted?: () => boolean,
 ): Promise<Blob> {
-  const MAX = 268435456; // 16 384² — mirrors geometry.ts MAX_PIXELS.
+  const MAX = 268435456; // 16 384² — decompression-bomb pixel-count guard.
   const fail = (name: string, message: string): Error => {
     const e = new Error(message);
     e.name = name;
@@ -125,21 +125,26 @@ export async function runPipeline(
   }
   const ctx = (canvas as HTMLCanvasElement).getContext('2d');
   if (!ctx) throw fail('InvalidImageError', 'No 2D context');
-  ctx.imageSmoothingEnabled = true;
+  // imageSmoothingEnabled already defaults to true; only the quality is raised.
   ctx.imageSmoothingQuality = 'high';
   if (o.backgroundColor) {
     ctx.fillStyle = o.backgroundColor;
     ctx.fillRect(0, 0, tw, th);
   }
+  // Default (stretch) draws the whole source; 'cover' scales to fill then
+  // center-crops the overflowing axis. Both share one 9-arg drawImage.
+  let sx = 0;
+  let sy = 0;
+  let sw = nw;
+  let sh = nh;
   if (o.fit === 'cover') {
-    // Scale to fill the target, then center-crop the overflowing axis.
     const s = Math.max(tw / nw, th / nh);
-    const sw = tw / s;
-    const sh = th / s;
-    ctx.drawImage(source, (nw - sw) / 2, (nh - sh) / 2, sw, sh, 0, 0, tw, th);
-  } else {
-    ctx.drawImage(source, 0, 0, tw, th);
+    sw = tw / s;
+    sh = th / s;
+    sx = (nw - sw) / 2;
+    sy = (nh - sh) / 2;
   }
+  ctx.drawImage(source, sx, sy, sw, sh, 0, 0, tw, th);
 
   const mime = o.mime ?? 'image/png';
   const q = o.quality;
