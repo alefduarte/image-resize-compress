@@ -20,6 +20,18 @@ export interface ResizeOptions {
   height?: number | 'auto';
   /** Cap the longest edge; aspect ratio preserved. Mutually exclusive with width/height. */
   maxWidthOrHeight?: number;
+  /**
+   * How the source maps onto an explicit `width`×`height` target.
+   * - `'stretch'` (default): distort to exactly fill the target.
+   * - `'cover'`: scale to fill, then center-crop the overflow, preserving the
+   *   source aspect ratio (ideal for square avatars / thumbnails).
+   *
+   * Only has an effect when BOTH `width` and `height` are set and their ratio
+   * differs from the source's. With a single dimension, `'auto'`, or
+   * `maxWidthOrHeight`, the target already matches the source aspect, so
+   * `'cover'` is a no-op.
+   */
+  fit?: 'stretch' | 'cover';
   /** Output format. Default: input format (falls back to png if input not encodable). */
   format?: ImageFormat;
   /** Flatten transparency onto this CSS color (any output format). */

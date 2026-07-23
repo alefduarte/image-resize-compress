@@ -340,6 +340,11 @@
           </div>
           <p class="hint">Leave blank for auto (keeps aspect ratio).</p>
 
+          <label class="check" for="fit">
+            <input id="fit" type="checkbox" />
+            Crop to fill instead of stretch (needs width + height)
+          </label>
+
           <label for="maxEdge">Max width or height</label>
           <input id="maxEdge" type="number" min="1" placeholder="e.g. 1024" />
           <p class="hint">Caps the longest edge. Overrides width/height.</p>
@@ -513,6 +518,7 @@
         'quality',
         'width',
         'height',
+        'fit',
         'maxEdge',
         'targetSize',
         'bg',
@@ -536,6 +542,7 @@
         opts.quality = Number(el('quality').value);
         if (el('width').value) opts.width = Number(el('width').value);
         if (el('height').value) opts.height = Number(el('height').value);
+        if (el('fit').checked) opts.fit = 'cover';
         if (el('maxEdge').value)
           opts.maxWidthOrHeight = Number(el('maxEdge').value);
         if (el('targetSize').value)
