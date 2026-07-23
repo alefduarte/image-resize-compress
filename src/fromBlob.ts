@@ -51,7 +51,8 @@ async function fromBlob(
   options?: ResizeOptions,
 ): Promise<Blob> {
   assertBrowserEnv();
-  return processBlob(blob, normalizeOptions(options));
+  // `?? {}` keeps a runtime `null` (or omitted arg) tolerant — mirrors fromURL.
+  return processBlob(blob, normalizeOptions(options ?? {}));
 }
 
 export default fromBlob;
