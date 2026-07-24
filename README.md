@@ -13,23 +13,23 @@ URL - in **~3 kB** with **zero runtime dependencies**.
 > worker option. Everything runs locally; nothing is uploaded. Source in
 > [`demo/`](demo/index.html).
 
-## Why this over browser-image-compression?
+## Why image-resize-compress?
 
-| Dimension                  | image-resize-compress                   | browser-image-compression |
-| -------------------------- | --------------------------------------- | ------------------------- |
-| Size (min+gzip)            | **~3 kB**                               | ~9 kB                     |
-| Runtime dependencies       | **0**                                   | 1 (inlined uzip fork)     |
-| Target file size           | `targetSize` (binary search)            | `maxSizeMB` (iterative)   |
-| URL input                  | ✅ `fromURL`                            | ❌                        |
-| Web worker                 | ✅ opt-in, zero-config, silent fallback | ✅ (default-ish)          |
-| `AbortSignal`              | ✅                                      | ✅                        |
-| EXIF orientation           | ✅ native (`createImageBitmap`)         | ✅ manual transforms      |
-| Provenance-signed releases | ✅                                      | ❌                        |
-| Real-browser test suite    | ✅ (Playwright/Chromium)                | partial                   |
-| Progress callback          | ❌                                      | ✅ `onProgress`           |
+| Feature              | What you get                                                |
+| -------------------- | ----------------------------------------------------------- |
+| Size                 | **~3 kB** min+gzip                                          |
+| Runtime dependencies | **Zero**                                                    |
+| Target file size     | `targetSize` via binary search                              |
+| Flexible input       | `File`, `Blob`, or URL (`fromURL`)                          |
+| Web worker           | Opt-in, zero-config, with silent fallback                   |
+| Cancellation         | Native `AbortSignal` support                                |
+| Progress             | `onProgress` callback (0–100), works on the worker path too |
+| EXIF orientation     | Handled natively via `createImageBitmap`                    |
+| Trustworthy releases | Provenance-signed, published from CI                        |
+| Tested for real      | Full real-browser test suite (Playwright/Chromium)          |
 
-If you need per-image progress reporting, `browser-image-compression` has it and
-we don't. For nearly everything else, this library is smaller and simpler.
+Small, dependency-free, and browser-native - it does resizing, compression, and
+format conversion, and nothing you don't need.
 
 ## Installation
 
@@ -105,18 +105,19 @@ const out = await fromBlob(bigFile, {
 
 Resize, compress, and/or convert a `Blob` or `File`.
 
-| Option             | Type                        | Default            | Notes                                                                        |
-| ------------------ | --------------------------- | ------------------ | ---------------------------------------------------------------------------- |
-| `quality`          | `number` (0–100]            | encoder default    | jpeg/webp only. Omit to avoid recompressing harder than needed.              |
-| `width`            | `number \| 'auto'`          | `'auto'`           | Derived from `height`/original when `'auto'`.                                |
-| `height`           | `number \| 'auto'`          | `'auto'`           | Derived from `width`/original when `'auto'`.                                 |
-| `maxWidthOrHeight` | `number`                    | -                  | Caps the longest edge, preserves aspect. Excludes `width`/`height`.          |
-| `fit`              | `'stretch' \| 'cover'`      | `'stretch'`        | `'cover'` scales to fill then center-crops. Needs explicit `width`+`height`. |
-| `format`           | `'png' \| 'jpeg' \| 'webp'` | input format → png | Output format.                                                               |
-| `backgroundColor`  | `string` (CSS color)        | transparent        | Flattens transparency onto this color.                                       |
-| `targetSize`       | `number` (bytes)            | -                  | jpeg/webp only; binary-searches quality.                                     |
-| `signal`           | `AbortSignal`               | -                  | Rejects with `AbortError`.                                                   |
-| `worker`           | `boolean`                   | `false`            | Off-main-thread, silent fallback (see above).                                |
+| Option             | Type                         | Default            | Notes                                                                                                                               |
+| ------------------ | ---------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `quality`          | `number` (0–100]             | encoder default    | jpeg/webp only. Omit to avoid recompressing harder than needed.                                                                     |
+| `width`            | `number \| 'auto'`           | `'auto'`           | Derived from `height`/original when `'auto'`.                                                                                       |
+| `height`           | `number \| 'auto'`           | `'auto'`           | Derived from `width`/original when `'auto'`.                                                                                        |
+| `maxWidthOrHeight` | `number`                     | -                  | Caps the longest edge, preserves aspect. Excludes `width`/`height`.                                                                 |
+| `fit`              | `'stretch' \| 'cover'`       | `'stretch'`        | `'cover'` scales to fill then center-crops. Needs explicit `width`+`height`.                                                        |
+| `format`           | `'png' \| 'jpeg' \| 'webp'`  | input format → png | Output format.                                                                                                                      |
+| `backgroundColor`  | `string` (CSS color)         | transparent        | Flattens transparency onto this color.                                                                                              |
+| `targetSize`       | `number` (bytes)             | -                  | jpeg/webp only; binary-searches quality.                                                                                            |
+| `signal`           | `AbortSignal`                | -                  | Rejects with `AbortError`.                                                                                                          |
+| `onProgress`       | `(progress: number) => void` | -                  | Called with `0`–`100`. One terminal `100` for a plain resize; one call per `targetSize` step. Works on the `worker` path (relayed). |
+| `worker`           | `boolean`                    | `false`            | Off-main-thread, silent fallback (see above).                                                                                       |
 
 **Throws:** `TypeError` (not a `Blob`), `InvalidImageError` (empty/undecodable),
 `RangeError` (bad `quality`/dimensions/`targetSize`, or `targetSize` with `png`),
@@ -211,6 +212,20 @@ async function onChange(e) {
 const under1MB = await fromBlob(file, {
   format: 'jpeg',
   targetSize: 1024 * 1024,
+});
+```
+
+### Drive a progress bar
+
+```js
+// Most granular during a targetSize search (one tick per binary-search step);
+// a plain resize reports a single terminal 100.
+const out = await fromBlob(file, {
+  format: 'jpeg',
+  targetSize: 200 * 1024,
+  onProgress: (p) => {
+    bar.value = p; // 0–100
+  },
 });
 ```
 

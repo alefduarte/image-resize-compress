@@ -20,6 +20,7 @@ export interface NormalizedOptions {
   backgroundColor?: string;
   targetSize?: number;
   signal?: AbortSignal;
+  onProgress?: (progress: number) => void;
   worker: boolean;
 }
 
@@ -53,6 +54,7 @@ export const normalizeOptions = (
     backgroundColor,
     targetSize,
     signal,
+    onProgress,
     worker,
   } = options;
 
@@ -108,6 +110,7 @@ export const normalizeOptions = (
     backgroundColor: backgroundColor ?? undefined,
     targetSize,
     signal,
+    onProgress,
     worker: worker ?? false,
   };
 };

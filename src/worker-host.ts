@@ -16,15 +16,18 @@ import { workerEntry } from './worker-entry';
 
 interface WorkerResponse {
   id: number;
-  ok: boolean;
+  ok?: boolean;
   blob?: Blob;
   error?: { name: string; message: string };
+  /** Progress relay (0–100). Present on progress messages, absent on the result. */
+  progress?: number;
 }
 
 interface Pending {
   resolve: (blob: Blob) => void;
   reject: (reason: unknown) => void;
   cleanup: () => void;
+  onProgress?: (progress: number) => void;
 }
 
 const pending = new Map<number, Pending>();
@@ -36,6 +39,10 @@ const onMessage = (e: MessageEvent<WorkerResponse>): void => {
   const data = e.data;
   const entry = pending.get(data.id);
   if (!entry) return; // Late result for an aborted/unknown id — drop it.
+  if (data.progress !== undefined) {
+    entry.onProgress?.(data.progress);
+    return; // Progress relay: keep the entry pending for the eventual result.
+  }
   pending.delete(data.id);
   entry.cleanup();
   if (data.ok && data.blob) entry.resolve(data.blob);
@@ -94,12 +101,15 @@ export const runInWorker = (
 
   // Resolve the output mime here (main thread has `mime.ts`) and strip the
   // non-cloneable AbortSignal; every remaining field is structured-clone-safe.
-  const { signal } = opts;
+  const { signal, onProgress } = opts;
   const serial: SerializableOptions = {
     ...opts,
     mime: resolveOutputMime(opts.format, blob.type),
   };
+  // Neither survives structured clone: strip the AbortSignal and the onProgress
+  // function. Abort and progress are both handled host-side.
   delete (serial as { signal?: AbortSignal }).signal;
+  delete (serial as { onProgress?: unknown }).onProgress;
 
   return new Promise<Blob>((resolve, reject) => {
     const id = nextId++;
@@ -118,7 +128,7 @@ export const runInWorker = (
       };
       signal.addEventListener('abort', onAbort);
     }
-    pending.set(id, { resolve, reject, cleanup });
+    pending.set(id, { resolve, reject, cleanup, onProgress });
     w.postMessage({ id, blob, opts: serial });
   });
 };

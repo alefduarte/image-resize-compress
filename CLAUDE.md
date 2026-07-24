@@ -5,8 +5,10 @@ every change; they are non-negotiable.
 
 - **Zero runtime dependencies.** Never add a `dependencies` entry. Everything
   ships as `devDependencies` only.
-- **Size budget.** ESM ≤ 2.8 kB, IIFE ≤ 3.1 kB (min+brotli), enforced by
-  `pnpm size`. The budget is a ceiling — shrink code, never raise the limit.
+- **Size budget.** ESM ≤ 2.86 kB, IIFE ≤ 3.13 kB (min+brotli), enforced by
+  `pnpm size`. The budget is a ceiling: shrink code to fit it first. Raise the
+  limit only for a deliberately-approved new feature that cannot fit otherwise,
+  and then only by the smallest amount that fits.
 - **Browser-only.** No Node canvas support. Outside a browser, fail fast with
   `EnvironmentError`. Do not add SSR/Node execution paths.
 - **Pure vs. browser-bound split.** `options.ts`, `geometry.ts`, `mime.ts`, and

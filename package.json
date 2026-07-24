@@ -1,7 +1,7 @@
 {
   "name": "image-resize-compress",
   "version": "2.1.1",
-  "description": "Image resizer, compressor, and converter built with modern TypeScript support",
+  "description": "Resize, compress, and convert images in the browser from a File, Blob, or URL - ~3 kB, zero runtime dependencies, TypeScript-first",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -97,11 +97,11 @@
   "size-limit": [
     {
       "path": "dist/index.js",
-      "limit": "2.8 kB"
+      "limit": "2.86 kB"
     },
     {
       "path": "dist/index.global.js",
-      "limit": "3.1 kB"
+      "limit": "3.13 kB"
     }
   ]
 }

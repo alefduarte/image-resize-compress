@@ -40,6 +40,14 @@ export interface ResizeOptions {
   /** Abort decode/encode/iteration. Rejects with DOMException 'AbortError'. */
   signal?: AbortSignal;
   /**
+   * Progress callback invoked with a 0–100 number as work proceeds. Coarse for a
+   * plain resize/convert (a single terminal `100`); granular during a
+   * `targetSize` search, one call per binary-search step plus a terminal `100`.
+   * Fires on both the main-thread and `worker` paths (worker progress is relayed
+   * back over `postMessage`).
+   */
+  onProgress?: (progress: number) => void;
+  /**
    * Process off the main thread (OffscreenCanvas worker); silent fallback.
    * Reserved for spec 08 — currently accepted and ignored (main-thread path).
    */
