@@ -10,8 +10,7 @@ const recorder = () => {
   return { values, onProgress };
 };
 
-const inRange = (values: number[]) =>
-  values.every((v) => v >= 0 && v <= 100);
+const inRange = (values: number[]) => values.every((v) => v >= 0 && v <= 100);
 
 beforeEach(() => {
   __resetWorker();
