@@ -13,23 +13,22 @@ URL - in **~3 kB** with **zero runtime dependencies**.
 > worker option. Everything runs locally; nothing is uploaded. Source in
 > [`demo/`](demo/index.html).
 
-## Why this over browser-image-compression?
+## Why image-resize-compress?
 
-| Dimension                  | image-resize-compress                   | browser-image-compression |
-| -------------------------- | --------------------------------------- | ------------------------- |
-| Size (min+gzip)            | **~3 kB**                               | ~9 kB                     |
-| Runtime dependencies       | **0**                                   | 1 (inlined uzip fork)     |
-| Target file size           | `targetSize` (binary search)            | `maxSizeMB` (iterative)   |
-| URL input                  | ✅ `fromURL`                            | ❌                        |
-| Web worker                 | ✅ opt-in, zero-config, silent fallback | ✅ (default-ish)          |
-| `AbortSignal`              | ✅                                      | ✅                        |
-| EXIF orientation           | ✅ native (`createImageBitmap`)         | ✅ manual transforms      |
-| Provenance-signed releases | ✅                                      | ❌                        |
-| Real-browser test suite    | ✅ (Playwright/Chromium)                | partial                   |
-| Progress callback          | ❌                                      | ✅ `onProgress`           |
+| Feature              | What you get                                                       |
+| -------------------- | ------------------------------------------------------------------ |
+| Size                 | **~3 kB** min+gzip                                                 |
+| Runtime dependencies | **Zero**                                                          |
+| Target file size     | `targetSize` via binary search                                     |
+| Flexible input       | `File`, `Blob`, or URL (`fromURL`)                                 |
+| Web worker           | Opt-in, zero-config, with silent fallback                          |
+| Cancellation         | Native `AbortSignal` support                                       |
+| EXIF orientation     | Handled natively via `createImageBitmap`                           |
+| Trustworthy releases | Provenance-signed, published from CI                               |
+| Tested for real      | Full real-browser test suite (Playwright/Chromium)                 |
 
-If you need per-image progress reporting, `browser-image-compression` has it and
-we don't. For nearly everything else, this library is smaller and simpler.
+Small, dependency-free, and browser-native - it does resizing, compression, and
+format conversion, and nothing you don't need.
 
 ## Installation
 
