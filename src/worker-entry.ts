@@ -51,7 +51,9 @@ export function workerEntry(run: typeof runPipeline): void {
         throw err;
       }
       try {
-        return await run(bitmap, bitmap.width, bitmap.height, opts);
+        return await run(bitmap, bitmap.width, bitmap.height, opts, undefined, (p) =>
+          scope.postMessage({ id, progress: p }),
+        );
       } finally {
         bitmap.close();
       }

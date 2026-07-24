@@ -55,6 +55,7 @@ export async function runPipeline(
   nh: number,
   o: SerializableOptions,
   isAborted?: () => boolean,
+  onProgress?: (progress: number) => void,
 ): Promise<Blob> {
   const MAX = 268435456; // 16 384² — decompression-bomb pixel-count guard.
   const fail = (name: string, message: string): Error => {
@@ -149,29 +150,38 @@ export async function runPipeline(
   const mime = o.mime ?? 'image/png';
   const q = o.quality;
   const target = o.targetSize;
+  let result: Blob;
   if (target === undefined) {
     abortCheck();
-    return encodeChecked(canvas, mime, q === undefined ? undefined : q / 100);
-  }
-  if (mime === 'image/png')
-    throw fail('RangeError', 'targetSize requires jpeg/webp output');
+    result = await encodeChecked(
+      canvas,
+      mime,
+      q === undefined ? undefined : q / 100,
+    );
+  } else {
+    if (mime === 'image/png')
+      throw fail('RangeError', 'targetSize requires jpeg/webp output');
 
-  let lo = 1;
-  let hi = Math.min(q ?? 92, 100);
-  let best: Blob | null = null;
-  let smallest: Blob | null = null;
-  for (let i = 0; i < 8; i += 1) {
-    abortCheck();
-    const qq = (lo + hi) / 2;
-    const b = await encodeChecked(canvas, mime, qq / 100);
-    if (!smallest || b.size < smallest.size) smallest = b;
-    if (b.size <= target) {
-      best = b;
-      lo = qq;
-    } else {
-      hi = qq;
+    let lo = 1;
+    let hi = Math.min(q ?? 92, 100);
+    let best: Blob | null = null;
+    let smallest: Blob | null = null;
+    for (let i = 0; i < 8; i += 1) {
+      abortCheck();
+      const qq = (lo + hi) / 2;
+      const b = await encodeChecked(canvas, mime, qq / 100);
+      onProgress?.((i + 1) * 12.5);
+      if (!smallest || b.size < smallest.size) smallest = b;
+      if (b.size <= target) {
+        best = b;
+        lo = qq;
+      } else {
+        hi = qq;
+      }
+      if (hi - lo <= 1) break;
     }
-    if (hi - lo <= 1) break;
+    result = best ?? (smallest as Blob);
   }
-  return best ?? (smallest as Blob);
+  onProgress?.(100);
+  return result;
 }

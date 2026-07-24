@@ -26,6 +26,7 @@ export const processBitmap = async (
       decoded.height,
       { ...opts, mime: resolveOutputMime(opts.format, opts.inputType) },
       signal ? () => signal.aborted : undefined,
+      opts.onProgress,
     );
   } catch (err) {
     throw rehydrate(err);

@@ -23,6 +23,7 @@ URL - in **~3 kB** with **zero runtime dependencies**.
 | Flexible input       | `File`, `Blob`, or URL (`fromURL`)                                 |
 | Web worker           | Opt-in, zero-config, with silent fallback                          |
 | Cancellation         | Native `AbortSignal` support                                       |
+| Progress             | `onProgress` callback (0–100), works on the worker path too         |
 | EXIF orientation     | Handled natively via `createImageBitmap`                           |
 | Trustworthy releases | Provenance-signed, published from CI                               |
 | Tested for real      | Full real-browser test suite (Playwright/Chromium)                 |
@@ -115,6 +116,7 @@ Resize, compress, and/or convert a `Blob` or `File`.
 | `backgroundColor`  | `string` (CSS color)        | transparent        | Flattens transparency onto this color.                                       |
 | `targetSize`       | `number` (bytes)            | -                  | jpeg/webp only; binary-searches quality.                                     |
 | `signal`           | `AbortSignal`               | -                  | Rejects with `AbortError`.                                                   |
+| `onProgress`       | `(progress: number) => void`| -                  | Called with `0`–`100`. One terminal `100` for a plain resize; one call per `targetSize` step. Works on the `worker` path (relayed). |
 | `worker`           | `boolean`                   | `false`            | Off-main-thread, silent fallback (see above).                                |
 
 **Throws:** `TypeError` (not a `Blob`), `InvalidImageError` (empty/undecodable),
@@ -210,6 +212,20 @@ async function onChange(e) {
 const under1MB = await fromBlob(file, {
   format: 'jpeg',
   targetSize: 1024 * 1024,
+});
+```
+
+### Drive a progress bar
+
+```js
+// Most granular during a targetSize search (one tick per binary-search step);
+// a plain resize reports a single terminal 100.
+const out = await fromBlob(file, {
+  format: 'jpeg',
+  targetSize: 200 * 1024,
+  onProgress: (p) => {
+    bar.value = p; // 0–100
+  },
 });
 ```
 
